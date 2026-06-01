@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HR Sushi">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#C0392B">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Assistant – Sushi Circle</title>
+<style>
+:root {
+  --red:#C0392B;--red-d:#922B21;--red-l:#FADBD8;
+  --bg:#FAFAF9;--surf:#FFFFFF;--brd:#E8E4E0;
+  --txt:#1A1A18;--mut:#6B6860;
+  --grn:#1E8449;--grn-bg:#EAFAF1;
+  --blu:#1A5276;--blu-bg:#EBF5FB;
+  --amb:#7D6608;--amb-bg:#FEF9E7;
+  --r:10px;--rs:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+header{background:var(--red);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+header .logo{font-size:20px;font-weight:700;letter-spacing:-.5px;}
+header .sub{font-size:12px;opacity:.85;}
+.wrap{max-width:820px;margin:0 auto;padding:20px 14px;}
+
+/* TABS */
+.tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{padding:8px 16px;border-radius:30px;border:1.5px solid var(--brd);background:var(--surf);color:var(--mut);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.tab:hover{border-color:var(--red);color:var(--red);}
+.tab.active{background:var(--red);color:#fff;border-color:var(--red);}
+.panel{display:none;}.panel.active{display:block;animation:fi .2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.card-title{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
+.badge-grn{background:var(--grn-bg);color:var(--grn);}
+.badge-blu{background:var(--blu-bg);color:var(--blu);}
+.badge-amb{background:var(--amb-bg);color:var(--amb);}
+.badge-red{background:var(--red-l);color:var(--red-d);}
+.badge-gray{background:#F0EDE8;color:#6B6860;}
+.vlf-item{border:1px solid var(--brd);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;background:var(--surf);transition:opacity .15s;}
+.vlf-item.erledigt{border-left:3px solid var(--grn);}
+.vlf-item.ausstehend{border-left:3px solid #E8B84B;}
+.vlf-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.vlf-main{flex:1;min-width:0;}
+.vlf-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.vlf-meta{font-size:12px;color:var(--mut);line-height:1.6;}
+.vlf-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.vlf-status-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid;cursor:pointer;font-weight:600;background:none;transition:all .15s;}
+.vlf-status-btn.erledigt{color:var(--grn);border-color:var(--grn);}
+.vlf-status-btn.ausstehend{color:#B7860B;border-color:#E8B84B;}
+.vlf-del{background:none;border:none;cursor:pointer;color:var(--mut);font-size:15px;padding:2px 5px;}
+.vlf-del:hover{color:var(--red);}
+.vlf-empty{text-align:center;padding:32px 16px;color:var(--mut);font-size:13px;}
+.vlf-note{font-size:11px;color:var(--mut);font-style:italic;margin-top:4px;}
+.csv-stat{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
+.csv-stat-box{flex:1;min-width:80px;text-align:center;padding:10px;border-radius:var(--rs);border:1px solid var(--brd);background:var(--bg);}
+.csv-stat-box .n{font-size:22px;font-weight:700;}
+.csv-stat-box .l{font-size:11px;color:var(--mut);margin-top:2px;}
+
+/* FORMS */
+label{display:block;font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px;}
+label:first-child{margin-top:0;}
+input[type=text],input[type=date],input[type=month],input[type=time],input[type=email],textarea,select{
+  width:100%;padding:8px 11px;border:1.5px solid var(--brd);border-radius:var(--rs);
+  font-size:13px;font-family:inherit;background:var(--bg);color:var(--txt);outline:none;transition:border .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--red);}
+textarea{min-height:72px;resize:vertical;line-height:1.6;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;}
+
+/* EMPLOYEE SELECT */
+.emp-select-wrap{position:relative;}
+.emp-select-wrap select{padding-right:32px;}
+.emp-badge-id{display:inline-block;font-size:11px;background:var(--blu-bg);color:var(--blu);border-radius:4px;padding:2px 7px;margin-left:6px;font-weight:600;vertical-align:middle;}
+
+/* UPLOAD */
+.drop{border:2px dashed var(--brd);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;font-size:13px;color:var(--mut);transition:all .2s;background:var(--bg);}
+.drop:hover{border-color:var(--red);color:var(--red);background:#FDF7F7;}
+.drop.ok{border-color:var(--grn);color:var(--grn);background:var(--grn-bg);border-style:solid;}
+.drop-icon{font-size:24px;margin-bottom:6px;}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:var(--rs);border:1.5px solid var(--brd);background:var(--surf);font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-family:inherit;color:var(--txt);}
+.btn:hover{background:var(--bg);border-color:#aaa;}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-red:hover{background:var(--red-d);border-color:var(--red-d);}
+.btn-grn{background:var(--grn);color:#fff;border-color:var(--grn);}
+.btn-grn:hover{opacity:.9;}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.btn-del{background:none;border:1px solid var(--brd);border-radius:var(--rs);padding:5px 9px;cursor:pointer;color:var(--mut);font-size:14px;transition:all .15s;}
+.btn-del:hover{color:var(--red);border-color:var(--red);}
+
+/* RESULT */
+.result{background:#FFFEF8;border:1px solid #E8E4D0;border-radius:var(--r);padding:18px;margin-top:14px;}
+.e-meta{font-size:12px;color:var(--mut);padding-bottom:8px;border-bottom:1px solid var(--brd);margin-bottom:8px;line-height:1.8;}
+.e-subj{font-size:13px;font-weight:600;margin-bottom:8px;}
+.e-body{font-size:12.5px;line-height:1.8;white-space:pre-wrap;background:#fff;border:1px solid var(--brd);border-radius:var(--rs);padding:12px;max-height:300px;overflow-y:auto;}
+
+/* CANVAS */
+.canvas-wrap{margin-top:8px;border-radius:var(--r);overflow:hidden;border:1px solid var(--brd);cursor:crosshair;}
+canvas{display:block;max-width:100%;}
+
+/* STUNDEN */
+.s-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px;}
+.s-row label{font-size:10px;}
+.total-strip{background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-top:8px;}
+.total-strip strong{font-size:17px;color:var(--red);}
+
+/* EMPLOYEE TABLE */
+.emp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.emp-table th{text-align:left;font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;padding:6px 10px;border-bottom:1px solid var(--brd);}
+.emp-table td{padding:8px 10px;border-bottom:1px solid #F0EDE8;vertical-align:middle;}
+.emp-table tr:last-child td{border-bottom:none;}
+.emp-table tr:hover td{background:#FAFAF6;}
+.id-chip{display:inline-block;font-size:11px;background:var(--blu-bg);color:var(--blu);border-radius:4px;padding:2px 7px;font-weight:600;font-family:monospace;}
+
+/* DT TICKET */
+.dt-list{margin-top:8px;}
+.dt-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--brd);border-radius:var(--rs);margin-bottom:6px;background:var(--surf);}
+.dt-item .name{flex:1;font-size:13px;font-weight:500;}
+.dt-item .id-chip{font-size:11px;}
+.dt-item .dt-drop{width:200px;}
+.dt-remove{background:none;border:none;cursor:pointer;color:var(--mut);font-size:16px;padding:2px 6px;}
+.dt-remove:hover{color:var(--red);}
+
+/* INFO BOX */
+.info{background:var(--blu-bg);border:1px solid #AED6F1;border-radius:var(--rs);padding:10px 13px;font-size:12.5px;color:var(--blu);line-height:1.6;margin-bottom:12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--grn);color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surf);border-radius:var(--r);padding:22px;width:min(420px,92vw);box-shadow:0 8px 32px rgba(0,0,0,.18);}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:14px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+@media(max-width:520px){.row2,.row3{grid-template-columns:1fr;}.s-row{grid-template-columns:1fr 1fr;}.s-row>div:nth-child(3){grid-column:1/-1;}}
+
+/* ── MOBILE / iPhone optimizations ── */
+@media(max-width:600px){
+  .tabs{gap:4px;}
+  .tab{padding:7px 11px;font-size:12px;}
+  header{padding:10px 14px;}
+  header .logo{font-size:17px;}
+  .wrap{padding:14px 10px;}
+  .card{padding:14px;}
+  .btn{padding:10px 14px;font-size:13px;}
+  .btn-row{gap:6px;}
+  .btn-row .btn{flex:1;justify-content:center;}
+  .vlf-item{flex-wrap:wrap;}
+  .vlf-actions{width:100%;justify-content:flex-end;}
+  input[type=text],input[type=date],input[type=month],input[type=time],select,textarea{
+    font-size:16px !important; /* prevent iOS zoom */
+  }
+}
+/* Safe area for iPhone notch */
+body{padding-bottom:env(safe-area-inset-bottom);}
+header{padding-top:max(14px, env(safe-area-inset-top));}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">🍣 HR Assistant</div>
+    <div class="sub">Sushi Circle Gastronomie GmbH · Duc Thang Duong · Gebietsleiter</div>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="tabs">
+  <button class="tab active" onclick="sw('krank',this)">🏥 Krankmeldung</button>
+  <button class="tab" onclick="sw('urlaub',this)">🌴 Urlaubsantrag</button>
+  <button class="tab" onclick="sw('stunden',this)">⏱ Stundennachweis</button>
+  <button class="tab" onclick="sw('dt',this)">🚆 Deutschlandticket</button>
+  <button class="tab" onclick="sw('emp',this)">👥 Mitarbeiter</button>
+  <button class="tab" onclick="sw('verlauf',this)">📋 Verlauf</button>
+  <button class="tab" onclick="sw('settings',this)">⚙ Einstellungen</button>
+</div>
+
+<!-- ===== KRANKMELDUNG ===== -->
+<div id="panel-krank" class="panel active">
+  <div class="card">
+    <div class="card-title">Krankmeldung weiterleiten <span class="badge badge-amb">Kein Ký erforderlich</span></div>
+    <div class="info">Formular ausfüllen → E-Mail-Entwurf erscheint automatisch → In Mail-App öffnen und Attest anhängen.</div>
+    <label>Mitarbeiter</label>
+    <select id="k-emp" onchange="fillEmp('k');updateKrank()">
+      <option value="">— Mitarbeiter wählen —</option>
+    </select>
+    <div class="row2">
+      <div><label>Name (manuell)</label><input type="text" id="k-name" placeholder="z.B. Nguyen Van A" oninput="updateKrank()"></div>
+      <div><label>Personalnummer</label><input type="text" id="k-id" placeholder="z.B. 1042" oninput="updateKrank()"></div>
+    </div>
+    <label>Filiale / Standort</label>
+    <input type="text" id="k-fil" placeholder="z.B. Hannover Hbf" oninput="updateKrank()">
+    <div class="row2">
+      <div><label>Krank von</label><input type="date" id="k-von" oninput="updateKrank()"></div>
+      <div><label>Voraussichtlich bis</label><input type="date" id="k-bis" oninput="updateKrank()"></div>
+    </div>
+    <label style="margin-top:14px">Ärztliches Attest (Erinnerung)</label>
+    <div class="drop" id="k-drop" onclick="document.getElementById('k-file').click()">
+      <div class="drop-icon">📎</div>Datei hier ablegen oder klicken<br><small>JPG, PNG oder PDF</small>
+      <input type="file" id="k-file" style="display:none" accept="image/*,.pdf" onchange="markDrop('k')">
+    </div>
+  </div>
+  <div class="result" id="k-res">
+    <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+    <div class="e-subj" id="k-subj"></div>
+    <div class="e-body" id="k-body"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" onclick="copyMail('k')">📋 E-Mail kopieren</button>
+      <button class="btn" onclick="mailto('k')">✉️ In Mail-App öffnen</button>
+      <button class="btn btn-grn" onclick="saveVerlauf('k')" style="margin-left:auto">✅ Als gesendet speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== URLAUBSANTRAG ===== -->
+<div id="panel-urlaub" class="panel">
+  <div class="card">
+    <div class="card-title">Urlaubsantrag <span class="badge badge-blu">Mit Unterschrift</span></div>
+    <div class="info">Upload → Klick auf Dokument zum Unterschreiben → Signiertes Bild herunterladen → E-Mail kopieren.</div>
+    <label>Mitarbeiter</label>
+    <select id="u-emp" onchange="fillEmp('u');updateUrlaub()">
+      <option value="">— Mitarbeiter wählen —</option>
+    </select>
+    <div class="row2">
+      <div><label>Name (manuell)</label><input type="text" id="u-name" placeholder="z.B. Nguyen Van A" oninput="updateUrlaub()"></div>
+      <div><label>Personalnummer</label><input type="text" id="u-id" placeholder="z.B. 1042" oninput="updateUrlaub()"></div>
+    </div>
+    <label>Filiale / Standort</label>
+    <input type="text" id="u-fil" placeholder="z.B. Hannover Hbf" oninput="updateUrlaub()">
+    <div class="row2">
+      <div><label>Urlaub von</label><input type="date" id="u-von" oninput="updateUrlaub()"></div>
+      <div><label>Urlaub bis</label><input type="date" id="u-bis" oninput="updateUrlaub()"></div>
+    </div>
+    <label style="margin-top:14px">Urlaubsantrag (Bild oder PDF)</label>
+    <div class="drop" id="u-drop" onclick="document.getElementById('u-file').click()">
+      <div class="drop-icon">📄</div>Datei hier ablegen oder klicken
+      <input type="file" id="u-file" style="display:none" accept="image/*,.pdf" onchange="loadCanvas(event)">
+    </div>
+    <div id="u-canvas-sec" style="display:none;margin-top:12px">
+      <label>Klicken Sie auf die gewünschte Stelle im Dokument</label>
+      <p style="font-size:12px;color:var(--mut);margin-bottom:6px">💡 Unterschrift-PNG zuerst in den Einstellungen hochladen.</p>
+      <div class="canvas-wrap"><canvas id="u-canvas" onclick="placeSig(event)"></canvas></div>
+      <div class="btn-row">
+        <button class="btn" onclick="resetCanvas()">↺ Zurücksetzen</button>
+        <button class="btn btn-grn" onclick="dlSigned()">⬇ Signiertes Bild herunterladen</button>
+      </div>
+    </div>
+  </div>
+  <div class="result" id="u-res">
+    <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+    <div class="e-subj" id="u-subj"></div>
+    <div class="e-body" id="u-body"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" onclick="copyMail('u')">📋 E-Mail kopieren</button>
+      <button class="btn" onclick="mailto('u')">✉️ In Mail-App öffnen</button>
+      <button class="btn btn-grn" onclick="saveVerlauf('u')" style="margin-left:auto">✅ Als gesendet speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STUNDENNACHWEIS ===== -->
+<div id="panel-stunden" class="panel">
+  <div class="card">
+    <div class="card-title">Stundennachweis erstellen <span class="badge badge-grn">Manuell</span></div>
+    <label>Mitarbeiter</label>
+    <select id="s-emp" onchange="fillEmp('s');updateStunden()">
+      <option value="">— Mitarbeiter wählen —</option>
+    </select>
+    <div class="row2">
+      <div><label>Name (manuell)</label><input type="text" id="s-name" placeholder="z.B. Nguyen Van A" oninput="updateStunden()"></div>
+      <div><label>Personalnummer</label><input type="text" id="s-id" placeholder="z.B. 1042" oninput="updateStunden()"></div>
+    </div>
+    <div class="row2">
+      <div><label>Filiale</label><input type="text" id="s-fil" placeholder="z.B. Hannover Hbf" oninput="updateStunden()"></div>
+      <div><label>Monat</label><input type="month" id="s-monat" oninput="updateStunden()"></div>
+    </div>
+    <label style="margin-top:14px">Arbeitsstunden</label>
+    <div id="s-rows"></div>
+    <button class="btn btn-sm" onclick="addRow()" style="margin-top:6px">+ Tag hinzufügen</button>
+    <div class="total-strip" id="s-total" style="display:none">
+      <span>Gesamtstunden</span><strong id="s-tot-val">0 Std.</strong>
+    </div>
+  </div>
+  <div class="result" id="s-res">
+    <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+    <div class="e-subj" id="s-subj"></div>
+    <div class="e-body" id="s-body"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" onclick="copyMail('s')">📋 E-Mail kopieren</button>
+      <button class="btn" onclick="mailto('s')">✉️ In Mail-App öffnen</button>
+      <button class="btn btn-grn" onclick="saveVerlauf('s')" style="margin-left:auto">✅ Als gesendet speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DEUTSCHLANDTICKET ===== -->
+<div id="panel-dt" class="panel">
+  <div class="card">
+    <div class="card-title">🚆 Deutschlandticket-Abrechnung <span class="badge badge-grn">Monatlich</span></div>
+    <div class="info">Wählen Sie den Monat, fügen Sie Mitarbeiter hinzu und laden Sie deren Vé-Ticket-Dateien hoch. Danach wird die E-Mail automatisch erstellt.</div>
+    <div class="row2">
+      <div>
+        <label>Monat / Abrechnungszeitraum</label>
+        <input type="month" id="dt-monat" oninput="updateDT()">
+      </div>
+      <div>
+        <label>Mitarbeiter hinzufügen</label>
+        <select id="dt-add-sel">
+          <option value="">— Auswählen —</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-sm" onclick="addDTItem()" style="margin-top:8px">+ Hinzufügen</button>
+    <div class="dt-list" id="dt-list"></div>
+  </div>
+  <div class="result" id="dt-res" style="display:none">
+    <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+    <div class="e-subj" id="dt-subj"></div>
+    <div class="e-body" id="dt-body"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" onclick="copyMail('dt')">📋 E-Mail kopieren</button>
+      <button class="btn" onclick="mailto('dt')">✉️ In Mail-App öffnen</button>
+      <button class="btn btn-grn" onclick="saveVerlauf('dt')" style="margin-left:auto">✅ Als gesendet speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MITARBEITER ===== -->
+<div id="panel-emp" class="panel">
+  <div class="card">
+    <div class="card-title">📥 CSV-Import vom Unternehmen</div>
+    <div class="info">Laden Sie die aktuelle Personaldatei (CSV aus dem System) hoch. Bestehende Mitarbeiter werden aktualisiert, neue hinzugefügt. Mitarbeiter die nicht mehr in der Datei sind, werden als inaktiv markiert.</div>
+    <div class="drop" id="csv-drop" onclick="document.getElementById('csv-file').click()">
+      <div class="drop-icon">📂</div>
+      Personal_XXXX-XX-XX.csv hier ablegen oder klicken<br>
+      <small>Semikolon-getrennte CSV-Datei aus dem Personalsystem</small>
+      <input type="file" id="csv-file" style="display:none" accept=".csv,text/csv" onchange="importCSV(event)">
+    </div>
+    <div id="csv-preview" style="display:none; margin-top:12px">
+      <div id="csv-preview-content"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Mitarbeiterliste <span class="badge badge-blu" id="emp-count-badge">0 Einträge</span></div>
+    <table class="emp-table">
+      <thead><tr><th>Name</th><th>Personalnr.</th><th>Filiale</th><th>Status</th><th></th></tr></thead>
+      <tbody id="emp-tbody"></tbody>
+    </table>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-red" onclick="openAddModal()">+ Manuell hinzufügen</button>
+      <button class="btn" onclick="exportCSVList()" style="margin-left:auto">⬇ Liste exportieren</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VERLAUF ===== -->
+<div id="panel-verlauf" class="panel">
+  <div class="card">
+    <div class="card-title">📋 Benachrichtigungsverlauf
+      <span class="badge badge-blu" id="vlf-count">0 Einträge</span>
+      <button class="btn btn-sm" onclick="clearVerlauf()" style="margin-left:auto;color:var(--mut)">🗑 Alle löschen</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+      <select id="vlf-filter-typ" onchange="renderVerlauf()" style="width:auto;min-width:160px">
+        <option value="">Alle Typen</option>
+        <option value="Krankmeldung">🏥 Krankmeldung</option>
+        <option value="Urlaubsantrag">🌴 Urlaubsantrag</option>
+        <option value="Stundennachweis">⏱ Stundennachweis</option>
+        <option value="Deutschlandticket">🚆 Deutschlandticket</option>
+      </select>
+      <select id="vlf-filter-status" onchange="renderVerlauf()" style="width:auto;min-width:140px">
+        <option value="">Alle Status</option>
+        <option value="erledigt">✅ Erledigt</option>
+        <option value="ausstehend">⏳ Ausstehend</option>
+      </select>
+      <input type="month" id="vlf-filter-month" onchange="renderVerlauf()" style="width:auto">
+      <button class="btn btn-sm" onclick="exportVerlauf()">⬇ Exportieren</button>
+    </div>
+    <div id="vlf-list"></div>
+  </div>
+</div>
+
+<!-- ===== EINSTELLUNGEN ===== -->
+<div id="panel-settings" class="panel">
+  <div class="card">
+    <div class="card-title">Unterschrift hochladen</div>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:12px">PNG mit transparentem Hintergrund empfohlen. Wird einmal gespeichert und bei allen Urlaubsanträgen verwendet.</p>
+    <div class="drop" id="sig-drop" onclick="document.getElementById('sig-file').click()">
+      <div class="drop-icon">✍️</div>Unterschrift PNG hochladen
+      <input type="file" id="sig-file" style="display:none" accept="image/*" onchange="loadSig()">
+    </div>
+    <div id="sig-prev-wrap" style="display:none;margin-top:10px;padding:10px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff;display:none;width:fit-content;">
+      <img id="sig-prev" style="max-height:55px;display:block;">
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Absender-Signatur</div>
+    <div style="font-size:12px;line-height:1.8;color:var(--mut);background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);padding:10px 13px;white-space:pre-wrap;" id="sig-display"></div>
+  </div>
+</div>
+</div><!-- /wrap -->
+
+<!-- MODAL: Mitarbeiter hinzufügen/bearbeiten -->
+<div class="modal-bg" id="emp-modal">
+  <div class="modal">
+    <h3 id="modal-title">Mitarbeiter hinzufügen</h3>
+    <label>Name</label>
+    <input type="text" id="m-name" placeholder="Nguyen Van A">
+    <label>Personalnummer</label>
+    <input type="text" id="m-id" placeholder="z.B. 1042">
+    <label>Filiale (Standard)</label>
+    <input type="text" id="m-fil" placeholder="z.B. Hannover Hbf">
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-red" onclick="saveEmp()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Kopiert!</div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────
+const TO = 'teamsushi@zahlenwerk.de', CC = 'hr@sushi-circle.de';
+const SIG = `Viele Grüße / best regards\n\nDuc Thang Duong\nGebietsleiter\n\nSushi Circle Gastronomie GmbH\nFrankfurter Str. 74-76\n63263 Neu-Isenburg\n\nTel.: +49 (0)173 6084 230\nE-Mail: t.duong@sushi-circle.de\nInternet: www.sushi-circle.de`;
+document.getElementById('sig-display').textContent = SIG;
+
+// ─── STORAGE ─────────────────────────────────────────────────
+function loadEmps() { try { return JSON.parse(localStorage.getItem('sc_emps') || '[]'); } catch(e) { return []; } }
+function saveEmps(arr) { localStorage.setItem('sc_emps', JSON.stringify(arr)); }
+
+// ─── TABS ─────────────────────────────────────────────────────
+function sw(id, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='emp') renderEmpTable();
+  if(id==='verlauf') renderVerlauf();
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────
+function fmtDate(v) { if(!v) return '___'; const [y,m,d]=v.split('-'); return `${d}.${m}.${y}`; }
+function fmtMonth(v) { if(!v) return '[Monat]'; return new Date(v+'-01').toLocaleDateString('de-DE',{month:'long',year:'numeric'}); }
+function toast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg||'✓ Kopiert!';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500);
+}
+function markDrop(p) {
+  const f=document.getElementById(p+'-file').files[0];
+  if(!f)return;
+  const d=document.getElementById(p+'-drop');
+  d.classList.add('ok'); d.innerHTML='✅ '+f.name;
+}
+
+// ─── DROPDOWN POPULATION ─────────────────────────────────────
+function populateDropdowns() {
+  const emps = loadEmps().filter(e=>e.active!==false);
+  ['k','u','s'].forEach(p => {
+    const sel = document.getElementById(p+'-emp');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Mitarbeiter wählen —</option>';
+    emps.forEach((e,i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${e.name}  [${e.id}]`;
+      sel.appendChild(opt);
+    });
+    sel.value = cur;
+  });
+  // DT dropdown
+  const dtSel = document.getElementById('dt-add-sel');
+  dtSel.innerHTML = '<option value="">— Auswählen —</option>';
+  emps.forEach((e,i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${e.name}  [${e.id}]`;
+    dtSel.appendChild(opt);
+  });
+}
+
+function fillEmp(p) {
+  const sel = document.getElementById(p+'-emp');
+  const idx = sel.value;
+  if(idx==='') return;
+  const e = loadEmps().filter(x=>x.active!==false)[idx];
+  if(!e) return;
+  document.getElementById(p+'-name').value = e.name;
+  document.getElementById(p+'-id').value = e.id;
+  if(document.getElementById(p+'-fil') && e.filiale)
+    document.getElementById(p+'-fil').value = e.filiale;
+}
+
+// ─── KRANKMELDUNG ────────────────────────────────────────────
+function updateKrank() {
+  const name = document.getElementById('k-name').value || '[Name]';
+  const pid  = document.getElementById('k-id').value;
+  const fil  = document.getElementById('k-fil').value || '[Filiale]';
+  const von  = fmtDate(document.getElementById('k-von').value);
+  const bis  = fmtDate(document.getElementById('k-bis').value);
+  const pidStr = pid ? ` (Personalnr. ${pid})` : '';
+  const subj = `Krankmeldung – ${name}${pidStr} – ${fil}`;
+  document.getElementById('k-subj').textContent = 'Betreff: '+subj;
+  document.getElementById('k-body').textContent =
+`Sehr geehrte Damen und Herren,
+
+hiermit möchte ich Sie darüber informieren, dass Herr/Frau ${name}${pidStr} (Filiale: ${fil}) aufgrund einer Erkrankung in der Zeit vom ${von} bis voraussichtlich ${bis} arbeitsunfähig ist.
+
+Das ärztliche Attest ist dieser E-Mail als Anhang beigefügt.
+
+Bitte nehmen Sie die entsprechenden Buchungen in der Lohnabrechnung vor.
+
+Bei Rückfragen stehe ich Ihnen gerne zur Verfügung.
+
+${SIG}`;
+}
+
+// ─── URLAUBSANTRAG ───────────────────────────────────────────
+function updateUrlaub() {
+  const name = document.getElementById('u-name').value || '[Name]';
+  const pid  = document.getElementById('u-id').value;
+  const fil  = document.getElementById('u-fil').value || '[Filiale]';
+  const von  = fmtDate(document.getElementById('u-von').value);
+  const bis  = fmtDate(document.getElementById('u-bis').value);
+  const pidStr = pid ? ` (Personalnr. ${pid})` : '';
+  const subj = `Urlaubsantrag – ${name}${pidStr} – ${fil}`;
+  document.getElementById('u-subj').textContent = 'Betreff: '+subj;
+  document.getElementById('u-body').textContent =
+`Sehr geehrte Damen und Herren,
+
+anbei übersende ich den genehmigten Urlaubsantrag von Herrn/Frau ${name}${pidStr} (Filiale: ${fil}) für den Zeitraum vom ${von} bis ${bis}.
+
+Der Antrag wurde von mir als Gebietsleiter genehmigt und liegt mit meiner Unterschrift versehen dieser E-Mail bei.
+
+Bitte nehmen Sie den Urlaub entsprechend in der Personalverwaltung auf.
+
+Bei Rückfragen stehe ich Ihnen gerne zur Verfügung.
+
+${SIG}`;
+}
+
+// ─── CANVAS / SIGNATURE ──────────────────────────────────────
+let sigImg = null, origPx = null;
+
+function loadSig() {
+  const f = document.getElementById('sig-file').files[0]; if(!f)return;
+  const r = new FileReader();
+  r.onload = e => {
+    sigImg = new Image();
+    sigImg.src = e.target.result;
+    sigImg.onload = () => {
+      localStorage.setItem('sc_sig', e.target.result);
+      document.getElementById('sig-prev').src = e.target.result;
+      document.getElementById('sig-prev-wrap').style.display='block';
+      const d=document.getElementById('sig-drop');
+      d.classList.add('ok'); d.innerHTML='✅ Unterschrift gespeichert';
+    };
+  };
+  r.readAsDataURL(f);
+}
+
+function restoreSig() {
+  const s = localStorage.getItem('sc_sig');
+  if(!s)return;
+  sigImg = new Image(); sigImg.src=s;
+  const d=document.getElementById('sig-drop');
+  d.classList.add('ok'); d.innerHTML='✅ Unterschrift gespeichert';
+  document.getElementById('sig-prev').src=s;
+  document.getElementById('sig-prev-wrap').style.display='block';
+}
+
+function loadCanvas(ev) {
+  const f=ev.target.files[0]; if(!f)return;
+  markDrop('u'); updateUrlaub();
+  document.getElementById('u-res').style.display='block';
+  const sec=document.getElementById('u-canvas-sec'); sec.style.display='block';
+  const cv=document.getElementById('u-canvas'), ctx=cv.getContext('2d');
+  if(f.type==='application/pdf') {
+    cv.width=595;cv.height=842;
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,595,842);
+    ctx.fillStyle='#aaa';ctx.font='15px sans-serif';ctx.textAlign='center';
+    ctx.fillText('PDF: '+f.name,297,400);
+    ctx.font='12px sans-serif';
+    ctx.fillText('Klicken Sie für die Unterschrift-Position',297,426);
+    ctx.textAlign='left';
+    origPx=ctx.getImageData(0,0,595,842);
+  } else {
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const mw=Math.min(img.width,760), sc=mw/img.width;
+        cv.width=img.width*sc; cv.height=img.height*sc;
+        ctx.drawImage(img,0,0,cv.width,cv.height);
+        origPx=ctx.getImageData(0,0,cv.width,cv.height);
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(f);
+  }
+}
+
+function placeSig(ev) {
+  if(!sigImg){alert('Bitte zuerst Unterschrift in den Einstellungen hochladen.');return;}
+  const cv=document.getElementById('u-canvas'),ctx=cv.getContext('2d');
+  if(origPx)ctx.putImageData(origPx,0,0);
+  const rc=cv.getBoundingClientRect();
+  const sx=cv.width/rc.width, sy=cv.height/rc.height;
+  const x=(ev.clientX-rc.left)*sx, y=(ev.clientY-rc.top)*sy;
+  const w=180, h=w*(sigImg.height/sigImg.width);
+  ctx.drawImage(sigImg,x-w/2,y-h/2,w,h);
+}
+
+function resetCanvas() { const cv=document.getElementById('u-canvas'); if(origPx)cv.getContext('2d').putImageData(origPx,0,0); }
+function dlSigned() {
+  const cv=document.getElementById('u-canvas');
+  const n=document.getElementById('u-name').value||'Mitarbeiter';
+  const a=document.createElement('a');
+  a.download=`Urlaubsantrag_${n}_unterschrieben.png`;
+  a.href=cv.toDataURL('image/png'); a.click();
+}
+
+// ─── STUNDENNACHWEIS ─────────────────────────────────────────
+let rowN=0;
+function addRow() {
+  rowN++;
+  const d=document.createElement('div'); d.className='s-row'; d.id='sr'+rowN;
+  d.innerHTML=`<div><label>Datum</label><input type="date" onchange="calcTot();updateStunden()"></div>
+<div><label>Von</label><input type="time" value="09:00" onchange="calcTot();updateStunden()"></div>
+<div><label>Bis</label><input type="time" value="17:00" onchange="calcTot();updateStunden()"></div>
+<button class="btn-del" onclick="this.parentElement.remove();calcTot();updateStunden()">×</button>`;
+  document.getElementById('s-rows').appendChild(d);
+  calcTot();
+}
+
+function calcTot() {
+  let mins=0;
+  document.querySelectorAll('#s-rows .s-row').forEach(r=>{
+    const ins=r.querySelectorAll('input[type=time]');
+    if(ins[0].value&&ins[1].value){
+      const [h1,m1]=ins[0].value.split(':').map(Number);
+      const [h2,m2]=ins[1].value.split(':').map(Number);
+      mins+=(h2*60+m2)-(h1*60+m1);
+    }
+  });
+  const h=Math.floor(mins/60),m=mins%60;
+  document.getElementById('s-tot-val').textContent=h+' Std.'+(m?' '+m+' Min.':'');
+  document.getElementById('s-total').style.display=mins>0?'flex':'none';
+}
+
+function buildSTable() {
+  const rows=[];
+  document.querySelectorAll('#s-rows .s-row').forEach(r=>{
+    const di=r.querySelector('input[type=date]');
+    const ins=r.querySelectorAll('input[type=time]');
+    const datum=fmtDate(di.value);
+    if(ins[0].value&&ins[1].value){
+      const [h1,m1]=ins[0].value.split(':').map(Number);
+      const [h2,m2]=ins[1].value.split(':').map(Number);
+      const tot=(h2*60+m2)-(h1*60+m1);
+      const h=Math.floor(tot/60),m=tot%60;
+      rows.push(`  ${datum.padEnd(12)}${ins[0].value} – ${ins[1].value} Uhr   (${h}h${m?m+'min':''})`);
+    }
+  });
+  return rows.join('\n')||'  [Keine Stunden eingetragen]';
+}
+
+function updateStunden() {
+  const name=document.getElementById('s-name').value||'[Name]';
+  const pid=document.getElementById('s-id').value;
+  const fil=document.getElementById('s-fil').value||'[Filiale]';
+  const mon=fmtMonth(document.getElementById('s-monat').value);
+  const pidStr=pid?` (Personalnr. ${pid})`:'';
+  const subj=`Stundennachweis – ${name}${pidStr} – ${mon}`;
+  document.getElementById('s-subj').textContent='Betreff: '+subj;
+  document.getElementById('s-body').textContent=
+`Sehr geehrte Damen und Herren,
+
+anbei übersende ich den Stundennachweis für Herrn/Frau ${name}${pidStr} (Filiale: ${fil}) für den Monat ${mon}.
+
+Da die Stunden nicht rechtzeitig im System erfasst wurden, liste ich diese hiermit manuell auf:
+
+${buildSTable()}
+
+Ich bitte Sie, die oben aufgeführten Stunden entsprechend in der Lohnabrechnung zu berücksichtigen.
+
+Bei Rückfragen stehe ich Ihnen gerne zur Verfügung.
+
+${SIG}`;
+  document.getElementById('s-res').style.display='block';
+}
+
+// ─── DEUTSCHLANDTICKET ───────────────────────────────────────
+let dtItems = []; // [{empIdx, fileName}]
+
+function addDTItem() {
+  const sel=document.getElementById('dt-add-sel');
+  const idx=sel.value; if(idx==='')return;
+  const emps=loadEmps().filter(e=>e.active!==false);
+  if(dtItems.find(x=>x.empIdx==idx)){toast('Schon in der Liste!');return;}
+  dtItems.push({empIdx:parseInt(idx), fileName:''});
+  renderDTList();
+  sel.value='';
+}
+
+function renderDTList() {
+  const emps=loadEmps().filter(e=>e.active!==false);
+  const list=document.getElementById('dt-list');
+  list.innerHTML='';
+  if(!dtItems.length){list.innerHTML='<p style="font-size:13px;color:var(--mut);padding:8px 0">Noch keine Mitarbeiter hinzugefügt.</p>';return;}
+  dtItems.forEach((item,i)=>{
+    const e=emps[item.empIdx];
+    if(!e)return;
+    const div=document.createElement('div'); div.className='dt-item';
+    div.innerHTML=`
+      <div class="name">${e.name} <span class="id-chip">${e.id}</span></div>
+      <label style="display:none" for="dt-file-${i}">Ticket</label>
+      <input type="file" id="dt-file-${i}" style="display:none" accept="image/*,.pdf" onchange="dtFileChange(${i},this)">
+      <button class="btn btn-sm" onclick="document.getElementById('dt-file-${i}').click()" style="flex-shrink:0">${item.fileName?'✅ '+item.fileName:'📎 Ticket hochladen'}</button>
+      <button class="dt-remove" onclick="dtRemove(${i})" aria-label="Entfernen">×</button>`;
+    list.appendChild(div);
+  });
+  updateDT();
+}
+
+function dtFileChange(i, inp) {
+  const f=inp.files[0]; if(!f)return;
+  dtItems[i].fileName=f.name;
+  renderDTList();
+}
+
+function dtRemove(i) { dtItems.splice(i,1); renderDTList(); }
+
+function updateDT() {
+  const emps=loadEmps().filter(e=>e.active!==false);
+  const mon=fmtMonth(document.getElementById('dt-monat').value);
+  if(!dtItems.length){document.getElementById('dt-res').style.display='none';return;}
+  const list=dtItems.map((item,i)=>{
+    const e=emps[item.empIdx];
+    return `  ${(i+1)}. ${e.name.padEnd(25)} Personalnr. ${e.id}${item.fileName?' – Ticket: '+item.fileName:''}`;
+  }).join('\n');
+  const subj=`Deutschlandticket-Abrechnung – ${mon}`;
+  document.getElementById('dt-subj').textContent='Betreff: '+subj;
+  document.getElementById('dt-body').textContent=
+`Sehr geehrte Damen und Herren,
+
+anbei übersende ich die Deutschlandticket-Abrechnung für den Monat ${mon}.
+
+Folgende Mitarbeiter haben ein Deutschlandticket erhalten:
+
+${list}
+
+Die entsprechenden Ticket-Nachweise sind als Anhänge beigefügt.
+
+Ich bitte Sie, die Kosten entsprechend in der Lohnabrechnung zu berücksichtigen.
+
+Bei Rückfragen stehe ich Ihnen gerne zur Verfügung.
+
+${SIG}`;
+  document.getElementById('dt-res').style.display='block';
+}
+
+// ─── EMPLOYEE MANAGEMENT ─────────────────────────────────────
+let editIdx = null;
+
+function renderEmpTable() {
+  const emps=loadEmps();
+  const tbody=document.getElementById('emp-tbody');
+  tbody.innerHTML='';
+  const active=emps.filter(e=>e.active!==false).length;
+  document.getElementById('emp-count-badge').textContent=active+' aktiv / '+emps.length+' gesamt';
+  if(!emps.length){
+    tbody.innerHTML='<tr><td colspan="5" style="color:var(--mut);font-size:13px;padding:16px 10px">Noch keine Mitarbeiter. CSV importieren oder manuell hinzufügen.</td></tr>';
+    return;
+  }
+  emps.forEach((e,i)=>{
+    const isActive=e.active!==false;
+    const tr=document.createElement('tr');
+    tr.style.opacity=isActive?'1':'0.5';
+    tr.innerHTML=`<td style="font-weight:500">${e.name}</td>
+<td><span class="id-chip">${e.id}</span></td>
+<td style="color:var(--mut);font-size:12px">${e.filiale||'—'}</td>
+<td><span class="badge ${isActive?'badge-grn':'badge-gray'}">${isActive?'Aktiv':'Inaktiv'}</span></td>
+<td style="display:flex;gap:6px;white-space:nowrap">
+  <button class="btn btn-sm" onclick="openEditModal(${i})">✏</button>
+  <button class="btn-del" onclick="delEmp(${i})">🗑</button>
+</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function importCSV(ev) {
+  const f=ev.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    // detect encoding — try UTF-8 first, fallback handled by browser
+    const text=e.target.result;
+    const lines=text.split(/\r?\n/).filter(l=>l.trim());
+    if(lines.length<2){alert('Datei scheint leer zu sein.');return;}
+
+    // parse header
+    const sep=';';
+    const header=lines[0].split(sep).map(h=>h.replace(/"/g,'').trim());
+    const col=name=>header.indexOf(name);
+    const iNr=col('Personalnr.'), iName=col('Name'), iVname=col('Vorname');
+    const iAustritt=col('Austritt'), iOrt=col('Letzter Einsatzort');
+    if(iNr<0||iName<0){alert('Spalten "Personalnr." und "Name" nicht gefunden.');return;}
+
+    function parseField(row,i){
+      if(i<0)return'';
+      return(row[i]||'').replace(/^"|"$/g,'').trim();
+    }
+
+    // parse all rows
+    const today=new Date();
+    const parsed=lines.slice(1).map(line=>{
+      const row=line.split(sep);
+      const pid=parseField(row,iNr);
+      const nachname=parseField(row,iName);
+      const vorname=parseField(row,iVname);
+      const name=vorname?vorname+' '+nachname:nachname;
+      // check Austritt — inactive if date is in the past (and not 31.12.9999)
+      let active=true;
+      if(iAustritt>=0){
+        const aus=parseField(row,iAustritt);
+        if(aus&&aus!=='31.12.9999'){
+          const [d,m,y]=aus.split('.').map(Number);
+          const ausDt=new Date(y,m-1,d);
+          if(ausDt<today)active=false;
+        }
+      }
+      // extract filiale from Letzter Einsatzort
+      let filiale='';
+      if(iOrt>=0){
+        const ort=parseField(row,iOrt);
+        // format: "402297-00 402297: MK-Einbeck-Altendorfer Tor"
+        // extract city + street after last colon
+        const m2=ort.match(/:\s*[A-Z]+-(.+)/);
+        if(m2) filiale=m2[1].trim();
+        else filiale=ort.split('-').slice(1).join('-').trim();
+      }
+      return{id:pid,name,filiale,active};
+    }).filter(e=>e.id&&e.name);
+
+    // merge with existing
+    const existing=loadEmps();
+    let added=0,updated=0,deactivated=0;
+    const csvIds=new Set(parsed.map(e=>e.id));
+
+    // mark existing not in CSV as inactive
+    existing.forEach(e=>{
+      if(!csvIds.has(e.id)&&e.active!==false){e.active=false;deactivated++;}
+    });
+
+    parsed.forEach(newE=>{
+      const idx=existing.findIndex(x=>x.id===newE.id);
+      if(idx>=0){existing[idx]={...existing[idx],...newE};updated++;}
+      else{existing.push(newE);added++;}
+    });
+
+    saveEmps(existing);
+    renderEmpTable();
+    populateDropdowns();
+
+    // show result
+    const preview=document.getElementById('csv-preview');
+    const content=document.getElementById('csv-preview-content');
+    preview.style.display='block';
+    content.innerHTML=`
+<div style="font-size:13px;font-weight:600;margin-bottom:8px">✅ Import abgeschlossen: <strong>${f.name}</strong></div>
+<div class="csv-stat">
+  <div class="csv-stat-box"><div class="n" style="color:var(--grn)">${added}</div><div class="l">Neu hinzugefügt</div></div>
+  <div class="csv-stat-box"><div class="n" style="color:var(--blu)">${updated}</div><div class="l">Aktualisiert</div></div>
+  <div class="csv-stat-box"><div class="n" style="color:var(--amb)">${deactivated}</div><div class="l">Als inaktiv markiert</div></div>
+  <div class="csv-stat-box"><div class="n">${existing.length}</div><div class="l">Gesamt</div></div>
+</div>`;
+    const drop=document.getElementById('csv-drop');
+    drop.classList.add('ok');
+    drop.innerHTML=`✅ ${f.name} importiert`;
+    toast(`✓ ${added} neu, ${updated} aktualisiert, ${deactivated} inaktiv`);
+  };
+  reader.readAsText(f,'UTF-8');
+}
+
+function exportCSVList() {
+  const emps=loadEmps().filter(e=>e.active!==false);
+  let csv='Personalnr.;Name;Filiale\n';
+  emps.forEach(e=>{ csv+=`${e.id};"${e.name}";"${e.filiale||''}"\n`; });
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='Mitarbeiterliste_SushiCircle.csv'; a.click();
+}
+
+function openAddModal() {
+  editIdx=null;
+  document.getElementById('modal-title').textContent='Mitarbeiter hinzufügen';
+  document.getElementById('m-name').value='';
+  document.getElementById('m-id').value='';
+  document.getElementById('m-fil').value='';
+  document.getElementById('emp-modal').classList.add('open');
+  document.getElementById('m-name').focus();
+}
+
+function openEditModal(i) {
+  editIdx=i;
+  const e=loadEmps()[i];
+  document.getElementById('modal-title').textContent='Mitarbeiter bearbeiten';
+  document.getElementById('m-name').value=e.name;
+  document.getElementById('m-id').value=e.id;
+  document.getElementById('m-fil').value=e.filiale||'';
+  document.getElementById('emp-modal').classList.add('open');
+  document.getElementById('m-name').focus();
+}
+
+function closeModal() { document.getElementById('emp-modal').classList.remove('open'); }
+
+function saveEmp() {
+  const name=document.getElementById('m-name').value.trim();
+  const id=document.getElementById('m-id').value.trim();
+  const fil=document.getElementById('m-fil').value.trim();
+  if(!name||!id){alert('Name und Personalnummer sind Pflichtfelder.');return;}
+  const emps=loadEmps();
+  if(editIdx!==null) emps[editIdx]={name,id,filiale:fil};
+  else emps.push({name,id,filiale:fil});
+  saveEmps(emps);
+  closeModal();
+  renderEmpTable();
+  populateDropdowns();
+  toast(editIdx!==null?'✓ Gespeichert':'✓ Mitarbeiter hinzugefügt');
+}
+
+function delEmp(i) {
+  if(!confirm('Mitarbeiter wirklich löschen?'))return;
+  const emps=loadEmps(); emps.splice(i,1); saveEmps(emps);
+  renderEmpTable(); populateDropdowns(); toast('✓ Gelöscht');
+}
+
+// close modal on bg click
+document.getElementById('emp-modal').addEventListener('click', function(e){ if(e.target===this)closeModal(); });
+// enter key in modal
+document.getElementById('emp-modal').addEventListener('keydown', e=>{ if(e.key==='Enter')saveEmp(); if(e.key==='Escape')closeModal(); });
+
+// ─── COPY / MAILTO ───────────────────────────────────────────
+function getEmail(p) {
+  return {
+    subj: document.getElementById(p+'-subj').textContent.replace('Betreff: ',''),
+    body: document.getElementById(p+'-body').textContent
+  };
+}
+function copyMail(p) {
+  const {subj,body}=getEmail(p);
+  navigator.clipboard.writeText('Betreff: '+subj+'\n\n'+body)
+    .then(()=>toast('✓ E-Mail kopiert!'))
+    .catch(()=>{
+      const ta=document.createElement('textarea');
+      ta.value='Betreff: '+subj+'\n\n'+body;
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');
+      document.body.removeChild(ta);toast('✓ Kopiert!');
+    });
+}
+function mailto(p) {
+  const {subj,body}=getEmail(p);
+  window.location.href=`mailto:${TO}?cc=${encodeURIComponent(CC)}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+
+// ─── VERLAUF ─────────────────────────────────────────────────
+const TYPE_ICONS = {Krankmeldung:'🏥',Urlaubsantrag:'🌴',Stundennachweis:'⏱',Deutschlandticket:'🚆'};
+const TYPE_MAP   = {k:'Krankmeldung',u:'Urlaubsantrag',s:'Stundennachweis',dt:'Deutschlandticket'};
+
+function loadVerlauf() { try{return JSON.parse(localStorage.getItem('sc_verlauf')||'[]');}catch(e){return[];} }
+function saveVerlaufData(arr){ localStorage.setItem('sc_verlauf',JSON.stringify(arr)); }
+
+function saveVerlauf(p) {
+  const typ = TYPE_MAP[p];
+  const subj = document.getElementById(p+'-subj').textContent.replace('Betreff: ','');
+  const body = document.getElementById(p+'-body').textContent;
+
+  // extract meta from current form
+  let empName='', empId='', zeitraum='', filiale='';
+  if(p==='k'||p==='u'||p==='s'){
+    empName = document.getElementById(p+'-name').value;
+    empId   = document.getElementById(p+'-id').value;
+    filiale = document.getElementById(p+'-fil')?document.getElementById(p+'-fil').value:'';
+  }
+  if(p==='k'){
+    const v=document.getElementById('k-von').value, b=document.getElementById('k-bis').value;
+    zeitraum = (v?fmtDate(v):'?')+' – '+(b?fmtDate(b):'?');
+  } else if(p==='u'){
+    const v=document.getElementById('u-von').value, b=document.getElementById('u-bis').value;
+    zeitraum = (v?fmtDate(v):'?')+' – '+(b?fmtDate(b):'?');
+  } else if(p==='s'){
+    zeitraum = fmtMonth(document.getElementById('s-monat').value);
+  } else if(p==='dt'){
+    zeitraum = fmtMonth(document.getElementById('dt-monat').value);
+    const emps=loadEmps().filter(e=>e.active!==false);
+    empName = dtItems.map(it=>emps[it.empIdx]?.name||'').filter(Boolean).join(', ');
+    empId   = dtItems.map(it=>emps[it.empIdx]?.id||'').filter(Boolean).join(', ');
+  }
+
+  const now = new Date();
+  const entry = {
+    id: now.getTime(),
+    typ, subj, body, empName, empId, filiale, zeitraum,
+    gesendetAm: now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})+
+                ' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr',
+    status: 'erledigt',
+    notiz: ''
+  };
+
+  const arr = loadVerlauf();
+  arr.unshift(entry);
+  saveVerlaufData(arr);
+  toast('✅ Im Verlauf gespeichert!');
+  // flash the tab
+  document.querySelectorAll('.tab').forEach(t=>{ if(t.textContent.includes('Verlauf'))t.style.fontWeight='700'; });
+  setTimeout(()=>document.querySelectorAll('.tab').forEach(t=>t.style.fontWeight=''),2000);
+}
+
+function renderVerlauf() {
+  let arr = loadVerlauf();
+  const filterTyp    = document.getElementById('vlf-filter-typ').value;
+  const filterStatus = document.getElementById('vlf-filter-status').value;
+  const filterMonth  = document.getElementById('vlf-filter-month').value;
+
+  if(filterTyp)    arr = arr.filter(e=>e.typ===filterTyp);
+  if(filterStatus) arr = arr.filter(e=>e.status===filterStatus);
+  if(filterMonth){
+    const [fy,fm] = filterMonth.split('-').map(Number);
+    arr = arr.filter(e=>{
+      // gesendetAm: "DD.MM.YYYY HH:MM Uhr"
+      const parts = e.gesendetAm.split('.');
+      if(parts.length<3)return true;
+      return parseInt(parts[2]===fy) && parseInt(parts[1])===fm;
+    });
+  }
+
+  document.getElementById('vlf-count').textContent = loadVerlauf().length+' Einträge';
+  const list = document.getElementById('vlf-list');
+
+  if(!arr.length){
+    list.innerHTML='<div class="vlf-empty">📭 Keine Einträge gefunden.<br><small>Klicken Sie nach dem E-Mail-Erstellen auf „Als gesendet speichern".</small></div>';
+    return;
+  }
+
+  list.innerHTML = arr.map(e=>`
+    <div class="vlf-item ${e.status}" id="vlf-${e.id}">
+      <div class="vlf-icon">${TYPE_ICONS[e.typ]||'📄'}</div>
+      <div class="vlf-main">
+        <div class="vlf-title">${e.typ} — ${e.empName||'(mehrere)'}</div>
+        <div class="vlf-meta">
+          ${e.empId?'<strong>Personalnr.:</strong> '+e.empId+' &nbsp;·&nbsp; ':''}
+          ${e.filiale?'<strong>Filiale:</strong> '+e.filiale+' &nbsp;·&nbsp; ':''}
+          ${e.zeitraum?'<strong>Zeitraum:</strong> '+e.zeitraum+' &nbsp;·&nbsp; ':''}
+          <strong>Gesendet:</strong> ${e.gesendetAm}
+        </div>
+        <div class="vlf-meta" style="margin-top:2px;color:#888;font-size:11px">✉️ ${e.subj}</div>
+        ${e.notiz?`<div class="vlf-note">💬 ${e.notiz}</div>`:''}
+        <div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <input type="text" placeholder="Notiz hinzufügen..." value="${e.notiz||''}"
+            onchange="setNotiz(${e.id},this.value)"
+            style="font-size:12px;padding:4px 8px;width:220px;border-color:var(--brd)">
+          <button class="btn btn-sm" onclick="showEmailPreview(${e.id})">👁 E-Mail ansehen</button>
+        </div>
+      </div>
+      <div class="vlf-actions">
+        <button class="vlf-status-btn ${e.status}" onclick="toggleStatus(${e.id})">
+          ${e.status==='erledigt'?'✅ Erledigt':'⏳ Ausstehend'}
+        </button>
+        <button class="vlf-del" onclick="delVerlauf(${e.id})" title="Löschen">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleStatus(id){
+  const arr=loadVerlauf();
+  const e=arr.find(x=>x.id===id); if(!e)return;
+  e.status=e.status==='erledigt'?'ausstehend':'erledigt';
+  saveVerlaufData(arr); renderVerlauf();
+}
+
+function setNotiz(id,val){
+  const arr=loadVerlauf();
+  const e=arr.find(x=>x.id===id); if(!e)return;
+  e.notiz=val; saveVerlaufData(arr);
+}
+
+function delVerlauf(id){
+  if(!confirm('Eintrag löschen?'))return;
+  saveVerlaufData(loadVerlauf().filter(e=>e.id!==id));
+  renderVerlauf(); toast('✓ Gelöscht');
+}
+
+function clearVerlauf(){
+  if(!confirm('Gesamten Verlauf löschen? Diese Aktion kann nicht rückgängig gemacht werden.'))return;
+  saveVerlaufData([]); renderVerlauf(); toast('✓ Verlauf geleert');
+}
+
+function showEmailPreview(id){
+  const e=loadVerlauf().find(x=>x.id===id); if(!e)return;
+  const w=window.open('','_blank','width=640,height=700');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${e.subj}</title>
+<style>body{font-family:'Segoe UI',sans-serif;padding:24px;max-width:600px;margin:0 auto;color:#1A1A18;line-height:1.7;}
+.meta{font-size:12px;color:#888;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:16px;}
+pre{white-space:pre-wrap;font-family:'Segoe UI',sans-serif;font-size:13px;}</style></head>
+<body><div class="meta">
+<strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de<br>
+<strong>Betreff:</strong> ${e.subj}<br>
+<strong>Gesendet:</strong> ${e.gesendetAm}
+</div><pre>${e.body}</pre><script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(r => console.log("SW registered:", r.scope))
+      .catch(e => console.log("SW error:", e));
+  });
+}
+</script>
+</body></html>`);
+  w.document.close();
+}
+
+function exportVerlauf(){
+  const arr=loadVerlauf();
+  let csv='Datum;Typ;Mitarbeiter;Personalnr.;Filiale;Zeitraum;Betreff;Status;Notiz\n';
+  arr.forEach(e=>{
+    csv+=`"${e.gesendetAm}";"${e.typ}";"${e.empName||''}";"${e.empId||''}";"${e.filiale||''}";"${e.zeitraum||''}";"${e.subj}";"${e.status}";"${e.notiz||''}"\n`;
+  });
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='Verlauf_SushiCircle.csv'; a.click();
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+restoreSig();
+populateDropdowns();
+addRow();
+updateKrank();
+updateUrlaub();
+updateStunden();
+renderVerlauf();
+</script>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(r => console.log("SW registered:", r.scope))
+      .catch(e => console.log("SW error:", e));
+  });
+}
+</script>
+</body>
+</html>
