@@ -1212,166 +1212,145 @@ function avSigDataUrl() {
 }
 
 function avPrint() {
-  const name   = document.getElementById('av-name').value || '___________';
-  const pid    = document.getElementById('av-pid').value  || '___________';
-  const str    = document.getElementById('av-strasse').value || '___________';
-  const plz    = document.getElementById('av-plz').value    || '___________';
+  var name   = document.getElementById('av-name').value || '___________';
+  var pid    = document.getElementById('av-pid').value  || '___________';
+  var str    = document.getElementById('av-strasse').value || '___________';
+  var plz    = document.getElementById('av-plz').value    || '___________';
+  var chkG   = document.getElementById('av-chk-gehalt').checked;
+  var chkV   = document.getElementById('av-chk-verlaeng').checked;
+  var chkS   = document.getElementById('av-chk-stunde').checked;
+  var chkW   = document.getElementById('av-chk-wochen').checked;
+  var chkSo  = document.getElementById('av-chk-sonst').checked;
+  var gAlt   = document.getElementById('av-g-alt').value || '___';
+  var gAb    = avFmtDate(document.getElementById('av-g-ab').value);
+  var gNeu   = document.getElementById('av-g-neu').value || '___';
+  var vMon   = document.getElementById('av-v-monate').value || '___';
+  var vBis   = avFmtDate(document.getElementById('av-v-bis').value);
+  var vUnb   = avFmtDate(document.getElementById('av-v-unbefristet').value);
+  var sAlt   = document.getElementById('av-s-alt').value || '___';
+  var sAb    = avFmtDate(document.getElementById('av-s-ab').value);
+  var sNeu   = document.getElementById('av-s-neu').value || '___';
+  var wAlt   = document.getElementById('av-w-alt').value || '___';
+  var wAb    = avFmtDate(document.getElementById('av-w-ab').value);
+  var wNeu   = document.getElementById('av-w-neu').value || '___';
+  var sonst  = document.getElementById('av-sonst-text').value || '';
+  var heute  = avTodayDE();
+  var sigUrl = avSigDataUrl();
 
-  const chkG = document.getElementById('av-chk-gehalt').checked;
-  const chkV = document.getElementById('av-chk-verlaeng').checked;
-  const chkS = document.getElementById('av-chk-stunde').checked;
-  const chkW = document.getElementById('av-chk-wochen').checked;
-  const chkSo= document.getElementById('av-chk-sonst').checked;
+  function chk(checked) {
+    return checked
+      ? '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;background:#333;color:#fff;font-size:10px;line-height:14px;text-align:center;margin-right:6px">&#10003;</span>'
+      : '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;margin-right:6px">&nbsp;</span>';
+  }
+  function field(val) {
+    return '<span style="display:inline-block;min-width:55mm;border-bottom:1px solid #000;padding:0 2mm">' + val + '</span>';
+  }
 
-  const gAlt = document.getElementById('av-g-alt').value;
-  const gAb  = avFmtDate(document.getElementById('av-g-ab').value);
-  const gNeu = document.getElementById('av-g-neu').value;
+  var html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">'
+    + '<title>Änderungsvereinbarung – ' + name + '</title>'
+    + '<style>'
+    + '@page{size:A4;margin:20mm}'
+    + '*{box-sizing:border-box}'
+    + 'body{font-family:Arial,sans-serif;font-size:11pt;color:#000;max-width:170mm;margin:0 auto;padding:10mm 0}'
+    + '.title{font-size:15pt;font-weight:bold;text-decoration:underline;margin-bottom:5mm}'
+    + '.chk-row{margin:2mm 0}'
+    + '.section{border-top:1.5px solid #000;padding:4mm 0;margin:4mm 0}'
+    + '.sec-title{font-weight:bold;text-decoration:underline;margin-bottom:3mm}'
+    + '.header-r{text-align:right;font-size:9pt;line-height:1.6;margin-bottom:6mm}'
+    + '.pers-box{border:1.5px solid #000;padding:3px 8px;display:inline-block;min-width:45mm}'
+    + '.sig-area{display:flex;gap:15mm;margin-top:14mm}'
+    + '.sig-col{flex:1}'
+    + '.sig-line{border-top:1px solid #000;padding-top:2mm;font-size:9pt;margin-top:14mm}'
+    + '.sig-img{max-height:16mm;max-width:50mm;display:block;margin-bottom:2mm}'
+    + '@media print{body{max-width:none}}'
+    + '</style></head><body>';
 
-  const vMon = document.getElementById('av-v-monate').value;
-  const vBis = avFmtDate(document.getElementById('av-v-bis').value);
-  const vUnb = avFmtDate(document.getElementById('av-v-unbefristet').value);
+  // Header
+  html += '<div class="header-r"><strong>Sushi Circle Gastronomie GmbH</strong><br>Frankfurter Str. 74-76<br>63263 Neu-Isenburg</div>';
 
-  const sAlt = document.getElementById('av-s-alt').value;
-  const sAb  = avFmtDate(document.getElementById('av-s-ab').value);
-  const sNeu = document.getElementById('av-s-neu').value;
+  // Title + Pers-Nr
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4mm">';
+  html += '<div class="title">ÄNDERUNGSVEREINBARUNG</div>';
+  html += '<div class="pers-box"><strong>Pers.-Nr.</strong>&nbsp;&nbsp;' + pid + '</div></div>';
 
-  const wAlt = document.getElementById('av-w-alt').value;
-  const wAb  = avFmtDate(document.getElementById('av-w-ab').value);
-  const wNeu = document.getElementById('av-w-neu').value;
+  // Checkboxes
+  html += '<div class="chk-row">' + chk(chkG) + ' Gehalt</div>';
+  html += '<div class="chk-row">' + chk(chkV) + ' Verlängerung</div>';
+  html += '<div class="chk-row">' + chk(chkS) + ' Stundenlohn</div>';
+  html += '<div class="chk-row">' + chk(chkW) + ' Anpassung Wochenstunden</div>';
+  html += '<div class="chk-row">' + chk(chkSo) + ' Sonstiges</div>';
 
-  const sonst= document.getElementById('av-sonst-text').value;
-  const sigUrl = avSigDataUrl();
-  const heute  = avTodayDE();
+  // Employee block
+  html += '<div style="margin:7mm 0 3mm">Das derzeitige Arbeitsverhältnis zwischen</div>';
+  html += '<div style="margin:2mm 0">Frau / Herr: ' + field(name) + '</div>';
+  html += '<div style="margin:2mm 0">Straße: ' + field(str) + '</div>';
+  html += '<div style="margin:2mm 0">PLZ, Ort: ' + field(plz) + '</div>';
+  html += '<div style="text-align:center;font-weight:bold;margin:5mm 0">und</div>';
+  html += '<div style="font-weight:bold;line-height:1.8">Sushi Circle Gastronomie GmbH<br>Frankfurter Str. 74-76<br>63263 Neu-Isenburg</div>';
+  html += '<div style="margin:5mm 0">Wird wie folgt geändert:</div>';
 
-  const chkBox = (checked) => checked
-    ? '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;background:#333;color:#fff;font-size:10px;line-height:14px;text-align:center;margin-right:6px">✓</span>'
-    : '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;margin-right:6px">&nbsp;</span>';
+  // Gehalt
+  if(chkG) {
+    html += '<div class="section"><div class="sec-title">Gehalt:</div>';
+    html += '<div>Das vereinbarte Gehalt in Höhe von ' + field(gAlt + ' €') + ' wird mit Wirkung ab '
+          + field(gAb) + ' auf ein Gehalt in Höhe von ' + field(gNeu + ' €') + ' geändert.</div></div>';
+  }
 
-  const html = \`<!DOCTYPE html>
-<html lang="de"><head><meta charset="UTF-8">
-<title>Änderungsvereinbarung – \${name}</title>
-<style>
-  @page{size:A4;margin:20mm 20mm 20mm 20mm}
-  *{box-sizing:border-box}
-  body{font-family:'Times New Roman',serif;font-size:11pt;color:#000;max-width:170mm;margin:0 auto;padding:0}
-  .header-right{text-align:right;font-size:9pt;line-height:1.5;margin-bottom:8mm}
-  .logo{width:28mm;float:right;margin-bottom:2mm}
-  .title{font-size:16pt;font-weight:bold;text-decoration:underline;margin-bottom:6mm}
-  .pers-box{border:1.5px solid #000;padding:4px 10px;display:inline-block;min-width:50mm;font-size:10pt;margin-bottom:6mm;float:right}
-  .clearfix::after{content:'';display:table;clear:both}
-  .chk-row{margin:2mm 0;font-size:11pt}
-  .emp-block{margin:6mm 0}
-  .emp-row{margin:1.5mm 0}
-  .field-line{display:inline-block;min-width:55mm;border-bottom:1px solid #000;padding:0 2mm}
-  .section{margin:5mm 0;padding:4mm 0;border-top:1.5px solid #000}
-  .section-title{font-weight:bold;text-decoration:underline;margin-bottom:3mm;font-size:11pt}
-  .sig-area{margin-top:16mm;display:flex;gap:20mm}
-  .sig-col{flex:1}
-  .sig-line{border-top:1px solid #000;margin-top:12mm;padding-top:2mm;font-size:9pt}
-  .sig-img{max-width:55mm;max-height:18mm;display:block;margin-bottom:2mm}
-  .ort-datum{font-size:10pt;margin-bottom:1mm}
-  .warn{font-weight:bold;font-size:10pt}
-  .sonst-lines{min-height:30mm;border-bottom:1px solid #ddd;margin:2mm 0;white-space:pre-wrap;font-size:10pt}
-  @media print{body{max-width:none}}
-</style>
-</head><body>
+  // Verlängerung
+  if(chkV) {
+    html += '<div class="section"><div class="sec-title">Verlängerung:</div>';
+    html += '<div>Das Arbeitsverhältnis wird um weitere ' + field(vMon + ' Monate') + ', bis zum '
+          + field(vBis) + ' verlängert.</div>';
+    if(vUnb !== '___________') {
+      html += '<div style="margin-top:3mm">Das Arbeitsverhältnis geht ab dem ' + field(vUnb)
+            + ' in ein unbefristetes Arbeitsverhältnis über.</div>';
+    }
+    html += '</div>';
+  }
 
-<div class="clearfix">
-  <div class="header-right" style="float:right;text-align:right;font-size:9pt;line-height:1.6">
-    <strong>Sushi Circle Gastronomie GmbH</strong><br>
-    Frankfurter Str. 74-76<br>
-    63263 Neu-Isenburg
-  </div>
-</div>
+  // Stundenlohn
+  if(chkS) {
+    html += '<div class="section"><div class="sec-title">Stundenlohn:</div>';
+    html += '<div>Der vereinbarte Stundenlohn in Höhe von ' + field(sAlt + ' €') + ' wird mit Wirkung ab dem '
+          + field(sAb) + ' auf einen Stundenlohn in Höhe von ' + field(sNeu + ' €') + ' geändert.</div>';
+    html += '<div style="font-weight:bold;margin-top:2mm">(Änderung des Stundenlohns ist immer nur zum 01. Eines Monats möglich!)</div></div>';
+  }
 
-<div style="margin-top:8mm" class="clearfix">
-  <div style="float:right;margin-bottom:4mm">
-    <div class="pers-box"><strong>Pers.-Nr.</strong>&nbsp;&nbsp;\${pid}</div>
-  </div>
-  <div class="title">ÄNDERUNGSVEREINBARUNG</div>
-</div>
+  // Wochenstunden
+  if(chkW) {
+    html += '<div class="section"><div class="sec-title">Anpassung Wochenstunden:</div>';
+    html += '<div>Die bisher vereinbarte durchschnittliche Wochenarbeitszeit von ' + field(wAlt + ' Stunden')
+          + ' wird ab ' + field(wAb) + ' auf ' + field(wNeu + ' Stunden') + ' durchschnittliche Wochenarbeitszeit geändert.</div>';
+    html += '<div style="font-weight:bold;margin-top:2mm">ACHTUNG! Die Änderung der Wochenarbeitszeit kann nur zu einem Montag erfolgen!</div></div>';
+  }
 
-<div class="chk-row">\${chkBox(chkG)} Gehalt</div>
-<div class="chk-row">\${chkBox(chkV)} Verlängerung</div>
-<div class="chk-row">\${chkBox(chkS)} Stundenlohn</div>
-<div class="chk-row">\${chkBox(chkW)} Anpassung Wochenstunden</div>
-<div class="chk-row">\${chkBox(chkSo)} Sonstiges</div>
+  // Sonstiges
+  if(chkSo) {
+    html += '<div class="section"><div class="sec-title">Sonstiges:</div>';
+    html += '<div style="min-height:30mm;white-space:pre-wrap">' + sonst + '</div></div>';
+  }
 
-<div class="emp-block" style="margin-top:8mm">
-  <div style="margin-bottom:3mm">Das derzeitige Arbeitsverhältnis zwischen</div>
-  <div class="emp-row">Frau / Herr: <span class="field-line">\${name}</span></div>
-  <div class="emp-row" style="margin-top:2mm">Straße: <span class="field-line">\${str}</span></div>
-  <div class="emp-row" style="margin-top:2mm">PLZ, Ort: <span class="field-line">\${plz}</span></div>
-</div>
+  html += '<div style="margin-top:4mm;font-size:10pt">Alle Übrigen Bestandteile des bisherigen Arbeitsvertrages behalten Ihre Wirksamkeit.</div>';
 
-<div style="text-align:center;font-weight:bold;margin:5mm 0">und</div>
+  // Signatures
+  html += '<div class="sig-area">';
+  html += '<div class="sig-col"><div class="sig-line">Ort, Datum<br><br>Unterschrift <strong>Arbeitnehmer</strong></div></div>';
+  html += '<div class="sig-col">';
+  html += '<div style="font-size:10pt;margin-bottom:2mm">Hannover, ' + heute + '</div>';
+  if(sigUrl) {
+    html += '<img src="' + sigUrl + '" class="sig-img">';
+  } else {
+    html += '<div style="height:16mm"></div>';
+  }
+  html += '<div style="border-top:1px solid #000;padding-top:2mm;font-size:9pt">Unterschrift <strong>Arbeitgeber</strong></div>';
+  html += '</div></div>';
 
-<div style="font-weight:bold;line-height:1.7">
-  Sushi Circle Gastronomie GmbH<br>
-  Frankfurter Str. 74-76<br>
-  63263 Neu-Isenburg
-</div>
+  html += '</body></html>';
 
-<div style="margin:5mm 0">Wird wie folgt geändert:</div>
-
-\${chkG ? \`<div class="section">
-  <div class="section-title">Gehalt:</div>
-  <div>Das vereinbarte Gehalt in Höhe von <span class="field-line">\${gAlt}&nbsp;€</span> wird mit Wirkung ab
-  <span class="field-line">\${gAb}</span> auf ein Gehalt in Höhe von <span class="field-line">\${gNeu}&nbsp;€</span> geändert.</div>
-</div>\` : ''}
-
-\${chkV ? \`<div class="section">
-  <div class="section-title">Verlängerung:</div>
-  <div>Das Arbeitsverhältnis wird um weitere <span class="field-line">\${vMon}&nbsp;Monate</span>, bis zum
-  <span class="field-line">\${vBis}</span> verlängert.</div>
-  \${vUnb !== '___________' ? \`<div style="margin-top:3mm">Das Arbeitsverhältnis geht ab dem <span class="field-line">\${vUnb}</span> in ein unbefristetes Arbeitsverhältnis über.</div>\` : ''}
-</div>\` : ''}
-
-\${chkS ? \`<div class="section">
-  <div class="section-title">Stundenlohn:</div>
-  <div>Der vereinbarte Stundenlohn in Höhe von <span class="field-line">\${sAlt}&nbsp;€</span> wird mit Wirkung ab
-  dem <span class="field-line">\${sAb}</span> auf einen Stundenlohn in Höhe von <span class="field-line">\${sNeu}&nbsp;€</span> geändert.</div>
-  <div class="warn" style="margin-top:2mm">(Änderung des Stundenlohns ist immer nur zum 01. Eines Monats möglich!)</div>
-</div>\` : ''}
-
-\${chkW ? \`<div class="section">
-  <div class="section-title">Anpassung Wochenstunden:</div>
-  <div>Die bisher vereinbarte durchschnittliche Wochenarbeitszeit von <span class="field-line">\${wAlt}&nbsp;Stunden</span>
-  wird ab <span class="field-line">\${wAb}</span> auf <span class="field-line">\${wNeu}&nbsp;Stunden</span>
-  durchschnittliche Wochenarbeitszeit geändert.</div>
-  <div class="warn" style="margin-top:2mm">ACHTUNG! Die Änderung der Wochenarbeitszeit kann nur zu einem Montag erfolgen!</div>
-</div>\` : ''}
-
-\${chkSo ? \`<div class="section">
-  <div class="section-title">Sonstiges:</div>
-  <div class="sonst-lines">\${sonst || ''}</div>
-</div>\` : ''}
-
-<div class="section" style="border-top:none;margin-top:4mm">
-  <div style="font-size:10pt">Alle Übrigen Bestandteile des bisherigen Arbeitsvertrages behalten Ihre Wirksamkeit.</div>
-</div>
-
-<div class="sig-area">
-  <div class="sig-col">
-    <div class="sig-line">
-      <div style="font-size:10pt;color:#555;margin-bottom:1mm">Ort, Datum</div>
-    </div>
-    <div style="height:20mm"></div>
-    <div class="sig-line">Unterschrift <strong>Arbeitnehmer</strong></div>
-  </div>
-  <div class="sig-col">
-    <div style="font-size:10pt;margin-bottom:1mm">Hannover, \${heute}</div>
-    \${sigUrl ? \`<img src="\${sigUrl}" class="sig-img">\` : '<div style="height:18mm"></div>'}
-    <div style="border-top:1px solid #000;padding-top:2mm;font-size:9pt">Unterschrift <strong>Arbeitgeber</strong></div>
-  </div>
-</div>
-
-<script>window.onload=()=>{window.print();}<\/script>
-</body></html>\`;
-
-  const w = window.open('', '_blank');
+  var w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
+  setTimeout(function(){ w.print(); }, 600);
 }
 
 function avUpdate() {} // placeholder for live preview if needed
