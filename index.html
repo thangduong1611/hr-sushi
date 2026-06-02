@@ -1169,20 +1169,20 @@ var AV_FIELDS_P1 = {
   v_unbefristet:  {x0:511,  y0:1425, x1:794,  y1:1456}
 };
 var AV_CHECKBOXES = [
-  {x:142, y:355},  // Gehalt
-  {x:142, y:421},  // Verlängerung
-  {x:142, y:457},  // Stundenlohn
-  {x:142, y:491},  // Wochenstunden
-  {x:142, y:525}   // Sonstiges
+  {x:137, y:352, w:22, h:26},  // Gehalt
+  {x:137, y:387, w:22, h:26},  // Verlängerung
+  {x:135, y:422, w:22, h:26},  // Stundenlohn
+  {x:135, y:457, w:22, h:26},  // Wochenstunden
+  {x:137, y:492, w:22, h:26}   // Sonstiges
 ];
 var AV_FIELDS_P2 = {
-  s_alt: {x0:585, y0:283, x1:764, y1:320},
-  s_ab:  {x0:199, y0:327, x1:408, y1:363},
-  s_neu: {x0:797, y0:328, x1:958, y1:363},
-  w_alt: {x0:814, y0:538, x1:992, y1:572},
-  w_ab:  {x0:323, y0:575, x1:551, y1:615},
-  w_neu: {x0:604, y0:576, x1:794, y1:614},
-  sonst: {x0:139, y0:870, x1:1060,y1:1182}
+  s_alt: {x0:585, y0:283, x1:764, y1:320,  fs:22},
+  s_ab:  {x0:199, y0:327, x1:408, y1:363,  fs:22},
+  s_neu: {x0:797, y0:328, x1:958, y1:363,  fs:22},
+  w_alt: {x0:814, y0:538, x1:992, y1:572,  fs:22},
+  w_ab:  {x0:323, y0:575, x1:551, y1:615,  fs:22},
+  w_neu: {x0:604, y0:576, x1:794, y1:614,  fs:22},
+  sonst: {x0:139, y0:870, x1:1060,y1:1182, fs:22}
 };
 var AV_DATUM_Y  = 1313;
 var AV_SIG_X    = 638;
@@ -1191,7 +1191,7 @@ var AV_SIG_W    = 380;
 var AV_SIG_H    = 120;
 var AV_FONT_SZ  = 28;  // normal fields
 var AV_FONT_SM  = 22;  // smaller fields
-var AV_FONT_DT  = 30;  // datum
+var AV_FONT_DT  = 22;  // datum
 
 function avPopulateDropdown() {
   var emps = loadEmps().filter(function(e){return e.active!==false;});
@@ -1287,22 +1287,25 @@ function avGeneratePDF() {
       ctx1.drawImage(img1, 0, 0);
 
       function fillField(ctx, f, text, fontSize) {
+        var fs = fontSize || f.fs || AV_FONT_SZ;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(f.x0, f.y0, f.x1-f.x0, f.y1-f.y0);
+        if(!text) return;
         ctx.fillStyle = '#000000';
-        ctx.font = (fontSize||AV_FONT_SZ) + 'px Arial, sans-serif';
-        var th = fontSize||AV_FONT_SZ;
-        var ty = f.y0 + Math.floor((f.y1-f.y0-th)/2) + th - 4;
+        ctx.font = fs + 'px Arial, sans-serif';
+        var th = fs;
+        var ty = f.y0 + Math.floor((f.y1-f.y0-th)/2) + th - 2;
         ctx.fillText(text, f.x0+5, ty);
       }
 
-      function drawChk(ctx, cx, cy, on) {
+      function drawChk(ctx, cb, on) {
         if(!on) return;
         ctx.fillStyle='#000000';
-        ctx.fillRect(cx, cy, 18, 18);
+        ctx.fillRect(cb.x, cb.y, cb.w||22, cb.h||26);
         ctx.strokeStyle='#ffffff'; ctx.lineWidth=3; ctx.lineCap='round';
-        ctx.beginPath(); ctx.moveTo(cx+3,cy+3); ctx.lineTo(cx+15,cy+15); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx+15,cy+3); ctx.lineTo(cx+3,cy+15); ctx.stroke();
+        var x=cb.x, y=cb.y, w=cb.w||22, h=cb.h||26;
+        ctx.beginPath(); ctx.moveTo(x+3,y+3); ctx.lineTo(x+w-3,y+h-3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+w-3,y+3); ctx.lineTo(x+3,y+h-3); ctx.stroke();
       }
 
       var F = AV_FIELDS_P1;
@@ -1312,7 +1315,7 @@ function avGeneratePDF() {
       fillField(ctx1, F.plz_ort,  plz,  AV_FONT_SZ);
 
       var chks = [chkG, chkV, chkS, chkW, chkSo];
-      AV_CHECKBOXES.forEach(function(cb,i){ drawChk(ctx1, cb.x, cb.y, chks[i]); });
+      AV_CHECKBOXES.forEach(function(cb,i){ drawChk(ctx1, cb, chks[i]); });
 
       if(chkG) {
         fillField(ctx1, F.g_alt, document.getElementById('av-g-alt').value, AV_FONT_SM);
