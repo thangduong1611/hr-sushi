@@ -1290,15 +1290,14 @@ async function avGeneratePDF() {
         size: size||fSize, font: f||font, color: black
       });
     }
-    // Draw filled checkbox square
+    // Draw filled checkbox square (no special chars - just solid black box with X)
     function chkFill(page, x, yFromTop) {
-      page.drawRectangle({
-        x: x, y: page.getHeight()-yFromTop-10,
-        width: 10, height: 10,
-        color: black
-      });
-      // Draw checkmark
-      page.drawText('✓', {x:x+1, y:page.getHeight()-yFromTop-9, size:8, font:font, color:PDFLib.rgb(1,1,1)});
+      var y = page.getHeight() - yFromTop - 10;
+      // Filled black square
+      page.drawRectangle({x:x, y:y, width:10, height:10, color:black});
+      // White X using two lines
+      page.drawLine({start:{x:x+2,y:y+2}, end:{x:x+8,y:y+8}, thickness:1.5, color:PDFLib.rgb(1,1,1)});
+      page.drawLine({start:{x:x+8,y:y+2}, end:{x:x+2,y:y+8}, thickness:1.5, color:PDFLib.rgb(1,1,1)});
     }
 
     var name   = document.getElementById('av-name').value;
