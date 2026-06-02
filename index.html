@@ -1263,344 +1263,109 @@ function avLoadPDF(ev) {
 // ── Main: fill PDF with pdf-lib ──
 async function avGeneratePDF() {
   if(!avPdfBytes) { alert('Bitte zuerst das Blanko-PDF hochladen.'); return; }
-  if(typeof PDFLib === 'undefined') { alert('PDF-Bibliothek lädt noch – bitte kurz warten.'); return; }
-
+  if(typeof PDFLib === 'undefined') { alert('PDF-Bibliothek laedt noch, bitte warten.'); return; }
   var status = document.getElementById('av-status');
-  status.textContent = 'PDF wird ausgefüllt…';
-
+  status.textContent = 'PDF wird ausgefuellt...';
   try {
-    var pdfDoc = await PDFLib.PDFDocument.load(avPdfBytes);
-    var pages  = pdfDoc.getPages();
-    var p1     = pages[0];
-    var p2     = pages[1];
-    var H1     = p1.getHeight(); // 842
-    var H2     = p2.getHeight();
+    var pdfDoc = await PDFLib.PDFDocument.load(avPdfBytes, {ignoreEncryption:true});
+    var form = pdfDoc.getForm();
 
-    // Embed font (Helvetica – no embedding needed, built-in)
-    var font   = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-    var fontB  = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-    var fSize  = 10;
-    var black  = PDFLib.rgb(0,0,0);
-
-    // Helper: drawText on page (PDF coords: y=0 is bottom)
-    function txt(page, text, x, yFromTop, size, f) {
-      if(!text) return;
-      page.drawText(String(text), {
-        x: x, y: page.getHeight() - yFromTop,
-        size: size||fSize, font: f||font, color: black
-      });
+    function sf(name, val) {
+      try { var f=form.getTextField(name); f.setText(val||''); f.enableReadOnly(); } catch(e){}
     }
-    // Draw filled checkbox square (no special chars - just solid black box with X)
-    function chkFill(page, x, yFromTop) {
-      var y = page.getHeight() - yFromTop - 10;
-      // Filled black square
-      page.drawRectangle({x:x, y:y, width:10, height:10, color:black});
-      // White X using two lines
-      page.drawLine({start:{x:x+2,y:y+2}, end:{x:x+8,y:y+8}, thickness:1.5, color:PDFLib.rgb(1,1,1)});
-      page.drawLine({start:{x:x+8,y:y+2}, end:{x:x+2,y:y+8}, thickness:1.5, color:PDFLib.rgb(1,1,1)});
+    function sc(name, checked) {
+      try { var f=form.getCheckBox(name); if(checked) f.check(); else f.uncheck(); f.enableReadOnly(); } catch(e){}
     }
 
-    var name   = document.getElementById('av-name').value;
-    var pid    = document.getElementById('av-pid').value;
-    var str    = document.getElementById('av-strasse').value;
-    var plz    = document.getElementById('av-plz').value;
+    var name  = document.getElementById('av-name').value||'';
+    var pid   = document.getElementById('av-pid').value||'';
+    var str   = document.getElementById('av-strasse').value||'';
+    var plz   = document.getElementById('av-plz').value||'';
+    var chkG  = document.getElementById('av-chk-gehalt').checked;
+    var chkV  = document.getElementById('av-chk-verlaeng').checked;
+    var chkS  = document.getElementById('av-chk-stunde').checked;
+    var chkW  = document.getElementById('av-chk-wochen').checked;
+    var chkSo = document.getElementById('av-chk-sonst').checked;
 
-    var chkG   = document.getElementById('av-chk-gehalt').checked;
-    var chkV   = document.getElementById('av-chk-verlaeng').checked;
-    var chkS   = document.getElementById('av-chk-stunde').checked;
-    var chkW   = document.getElementById('av-chk-wochen').checked;
-    var chkSo  = document.getElementById('av-chk-sonst').checked;
+    sf('Textfeld3', pid);
+    sf('Textfeld0', name);
+    sf('Textfeld1', str);
+    sf('Textfeld2', plz);
 
-    // PAGE 1 ─────────────────────────────────────────
-    // Pers.-Nr.
-    txt(p1, pid,  420, 150);
-    // Frau/Herr name
-    txt(p1, name, 142, 323);
-    // Straße
-    txt(p1, str,  142, 349);
-    // PLZ Ort
-    txt(p1, plz,  142, 374);
+    sc('Kontrollk\u00e4stchen0', chkG);
+    sc('Kontrollk\u00e4stchen1', chkV);
+    sc('Kontrollk\u00e4stchen2', chkS);
+    sc('Kontrollk\u00e4stchen3', chkW);
+    sc('Kontrollk\u00e4stchen4', chkSo);
 
-    // Checkboxes (cover the ☐ with filled box at same position)
-    if(chkG)  chkFill(p1, 71, 181);
-    if(chkV)  chkFill(p1, 71, 197);
-    if(chkS)  chkFill(p1, 71, 213);
-    if(chkW)  chkFill(p1, 71, 229);
-    if(chkSo) chkFill(p1, 71, 245);
-
-    // Gehalt fields
     if(chkG) {
-      var gAlt = document.getElementById('av-g-alt').value;
-      var gAb  = avFmtDate(document.getElementById('av-g-ab').value);
-      var gNeu = document.getElementById('av-g-neu').value;
-      // "Das vereinbarte Gehalt in Höhe von ___ €" -> fill at blank position
-      txt(p1, gAlt, 248, 563);  // after "von"
-      txt(p1, gAb,  71,  579);  // ab ___
-      txt(p1, gNeu, 318, 579);  // auf ___ €
+      sf('Textfeld4', document.getElementById('av-g-alt').value);
+      sf('Textfeld5', avFmtDate(document.getElementById('av-g-ab').value));
+      sf('Textfeld6', document.getElementById('av-g-neu').value);
     }
-
-    // Verlängerung fields
     if(chkV) {
-      var vMon = document.getElementById('av-v-monate').value;
-      var vBis = avFmtDate(document.getElementById('av-v-bis').value);
-      var vUnb = avFmtDate(document.getElementById('av-v-unbefristet').value);
-      txt(p1, vMon, 294, 658);  // "weitere ___ Monate"
-      txt(p1, vBis, 71,  679);  // "bis zum ___"
-      if(vUnb) txt(p1, vUnb, 280, 720); // "ab dem ___"
+      sf('Textfeld7', document.getElementById('av-v-monate').value);
+      sf('Textfeld8', avFmtDate(document.getElementById('av-v-bis').value));
+      sf('Textfeld9', avFmtDate(document.getElementById('av-v-unbefristet').value));
     }
-
-    // PAGE 2 ─────────────────────────────────────────
-    // Stundenlohn
     if(chkS) {
-      var sAlt = document.getElementById('av-s-alt').value;
-      var sAb  = avFmtDate(document.getElementById('av-s-ab').value);
-      var sNeu = document.getElementById('av-s-neu').value;
-      txt(p2, sAlt, 280, 153);
-      txt(p2, sAb,  107, 174);
-      txt(p2, sNeu, 395, 174);
+      sf('Textfeld10', document.getElementById('av-s-alt').value);
+      sf('Textfeld11', avFmtDate(document.getElementById('av-s-ab').value));
+      sf('Textfeld12', document.getElementById('av-s-neu').value);
     }
-
-    // Wochenstunden
     if(chkW) {
-      var wAlt = document.getElementById('av-w-alt').value;
-      var wAb  = avFmtDate(document.getElementById('av-w-ab').value);
-      var wNeu = document.getElementById('av-w-neu').value;
-      txt(p2, wAlt, 357, 279);
-      txt(p2, wAb,  152, 300);
-      txt(p2, wNeu, 306, 300);
+      sf('Textfeld13', document.getElementById('av-w-alt').value);
+      sf('Textfeld14', avFmtDate(document.getElementById('av-w-ab').value));
+      sf('Textfeld15', document.getElementById('av-w-neu').value);
     }
+    if(chkSo) { sf('Textfeld16', document.getElementById('av-sonst-text').value); }
 
-    // Sonstiges
-    if(chkSo) {
-      var sonst = document.getElementById('av-sonst-text').value || '';
-      var lines = sonst.split('\n');
-      var yPos  = 446;
-      lines.forEach(function(line){
-        if(yPos > 555) return;
-        txt(p2, line, 71, yPos);
-        yPos += 19;
-      });
-    }
+    form.flatten();
 
-    // Ort, Datum + Unterschrift Arbeitgeber (right column, page 2)
-    var heute = 'Hannover, ' + avTodayDE();
-    txt(p2, heute, 319, 694);
+    var pages = pdfDoc.getPages();
+    var p2 = pages[1];
+    var H2 = p2.getHeight();
+    var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-    // Embed signature image
+    p2.drawText('Hannover, ' + avTodayDE(), {
+      x:319, y:H2-694+2, size:9, font:font, color:PDFLib.rgb(0,0,0)
+    });
+
     if(avSigHasContent()) {
-      var sigCanvas = document.getElementById('av-sig-canvas');
-      var sigDataUrl = sigCanvas.toDataURL('image/png');
-      var sigBase64 = sigDataUrl.split(',')[1];
-      var sigBytes = Uint8Array.from(atob(sigBase64), function(c){return c.charCodeAt(0);});
-      var sigImage = await pdfDoc.embedPng(sigBytes);
-      var sigDims = sigImage.scaleToFit(120, 30);
-      p2.drawImage(sigImage, {
-        x: 319, y: H2 - 732 + 5,
-        width: sigDims.width, height: sigDims.height
-      });
+      var c = document.getElementById('av-sig-canvas');
+      var b64 = c.toDataURL('image/png').split(',')[1];
+      var bytes = Uint8Array.from(atob(b64), function(ch){return ch.charCodeAt(0);});
+      var img = await pdfDoc.embedPng(bytes);
+      p2.drawImage(img, {x:319, y:H2-728, width:170, height:50});
     }
 
-    // Save and download
-    var pdfOut = await pdfDoc.save();
-    var blob   = new Blob([pdfOut], {type:'application/pdf'});
-    var url    = URL.createObjectURL(blob);
-    var a      = document.createElement('a');
-    a.href     = url;
-    var safeName = (name || 'Mitarbeiter').replace(/\s+/g, '_');
-    a.download = 'AV_' + safeName + '_' + avTodayDE().replace(/\./g,'-') + '.pdf';
+    var out = await pdfDoc.save();
+    var blob = new Blob([out], {type:'application/pdf'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href=url;
+    a.download='AV_'+(name||'MA').replace(/\s+/g,'_')+'_'+avTodayDE().replace(/\./g,'-')+'.pdf';
     a.click();
     URL.revokeObjectURL(url);
-    status.textContent = '✅ PDF heruntergeladen!';
-    toast('✅ PDF erstellt!');
-
+    status.textContent='PDF heruntergeladen!';
+    toast('PDF erstellt!');
   } catch(err) {
     console.error(err);
-    status.textContent = 'Fehler: ' + err.message;
-    alert('Fehler beim Erstellen: ' + err.message);
+    status.textContent='Fehler: '+err.message;
+    alert('Fehler: '+err.message);
   }
 }
-
-// ─── VERLAUF ─────────────────────────────────────────────────
-const TYPE_ICONS = {Krankmeldung:'🏥',Urlaubsantrag:'🌴',Stundennachweis:'⏱',Deutschlandticket:'🚆'};
-const TYPE_MAP   = {k:'Krankmeldung',u:'Urlaubsantrag',s:'Stundennachweis',dt:'Deutschlandticket'};
-
-function loadVerlauf() { try{return JSON.parse(localStorage.getItem('sc_verlauf')||'[]');}catch(e){return[];} }
-function saveVerlaufData(arr){ localStorage.setItem('sc_verlauf',JSON.stringify(arr)); }
-
-function saveVerlauf(p) {
-  const typ = TYPE_MAP[p];
-  const subj = document.getElementById(p+'-subj').textContent.replace('Betreff: ','');
-  const body = document.getElementById(p+'-body').textContent;
-
-  // extract meta from current form
-  let empName='', empId='', zeitraum='', filiale='';
-  if(p==='k'||p==='u'||p==='s'){
-    empName = document.getElementById(p+'-name').value;
-    empId   = document.getElementById(p+'-id').value;
-    filiale = document.getElementById(p+'-fil')?document.getElementById(p+'-fil').value:'';
-  }
-  if(p==='k'){
-    const v=document.getElementById('k-von').value, b=document.getElementById('k-bis').value;
-    zeitraum = (v?fmtDate(v):'?')+' – '+(b?fmtDate(b):'?');
-  } else if(p==='u'){
-    const v=document.getElementById('u-von').value, b=document.getElementById('u-bis').value;
-    zeitraum = (v?fmtDate(v):'?')+' – '+(b?fmtDate(b):'?');
-  } else if(p==='s'){
-    zeitraum = fmtMonth(document.getElementById('s-monat').value);
-  } else if(p==='dt'){
-    zeitraum = fmtMonth(document.getElementById('dt-monat').value);
-    const emps=loadEmps().filter(e=>e.active!==false);
-    empName = dtItems.map(it=>emps[it.empIdx]?.name||'').filter(Boolean).join(', ');
-    empId   = dtItems.map(it=>emps[it.empIdx]?.id||'').filter(Boolean).join(', ');
-  }
-
-  const now = new Date();
-  const entry = {
-    id: now.getTime(),
-    typ, subj, body, empName, empId, filiale, zeitraum,
-    gesendetAm: now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})+
-                ' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr',
-    status: 'erledigt',
-    notiz: ''
-  };
-
-  const arr = loadVerlauf();
-  arr.unshift(entry);
-  saveVerlaufData(arr);
-  toast('✅ Im Verlauf gespeichert!');
-  // flash the tab
-  document.querySelectorAll('.tab').forEach(t=>{ if(t.textContent.includes('Verlauf'))t.style.fontWeight='700'; });
-  setTimeout(()=>document.querySelectorAll('.tab').forEach(t=>t.style.fontWeight=''),2000);
-}
-
-function renderVerlauf() {
-  let arr = loadVerlauf();
-  const filterTyp    = document.getElementById('vlf-filter-typ').value;
-  const filterStatus = document.getElementById('vlf-filter-status').value;
-  const filterMonth  = document.getElementById('vlf-filter-month').value;
-
-  if(filterTyp)    arr = arr.filter(e=>e.typ===filterTyp);
-  if(filterStatus) arr = arr.filter(e=>e.status===filterStatus);
-  if(filterMonth){
-    const [fy,fm] = filterMonth.split('-').map(Number);
-    arr = arr.filter(e=>{
-      // gesendetAm: "DD.MM.YYYY HH:MM Uhr"
-      const parts = e.gesendetAm.split('.');
-      if(parts.length<3)return true;
-      return parseInt(parts[2]===fy) && parseInt(parts[1])===fm;
-    });
-  }
-
-  document.getElementById('vlf-count').textContent = loadVerlauf().length+' Einträge';
-  const list = document.getElementById('vlf-list');
-
-  if(!arr.length){
-    list.innerHTML='<div class="vlf-empty">📭 Keine Einträge gefunden.<br><small>Klicken Sie nach dem E-Mail-Erstellen auf „Als gesendet speichern".</small></div>';
-    return;
-  }
-
-  list.innerHTML = arr.map(e=>`
-    <div class="vlf-item ${e.status}" id="vlf-${e.id}">
-      <div class="vlf-icon">${TYPE_ICONS[e.typ]||'📄'}</div>
-      <div class="vlf-main">
-        <div class="vlf-title">${e.typ} — ${e.empName||'(mehrere)'}</div>
-        <div class="vlf-meta">
-          ${e.empId?'<strong>Personalnr.:</strong> '+e.empId+' &nbsp;·&nbsp; ':''}
-          ${e.filiale?'<strong>Filiale:</strong> '+e.filiale+' &nbsp;·&nbsp; ':''}
-          ${e.zeitraum?'<strong>Zeitraum:</strong> '+e.zeitraum+' &nbsp;·&nbsp; ':''}
-          <strong>Gesendet:</strong> ${e.gesendetAm}
-        </div>
-        <div class="vlf-meta" style="margin-top:2px;color:#888;font-size:11px">✉️ ${e.subj}</div>
-        ${e.notiz?`<div class="vlf-note">💬 ${e.notiz}</div>`:''}
-        <div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          <input type="text" placeholder="Notiz hinzufügen..." value="${e.notiz||''}"
-            onchange="setNotiz(${e.id},this.value)"
-            style="font-size:12px;padding:4px 8px;width:220px;border-color:var(--brd)">
-          <button class="btn btn-sm" onclick="showEmailPreview(${e.id})">👁 E-Mail ansehen</button>
-        </div>
-      </div>
-      <div class="vlf-actions">
-        <button class="vlf-status-btn ${e.status}" onclick="toggleStatus(${e.id})">
-          ${e.status==='erledigt'?'✅ Erledigt':'⏳ Ausstehend'}
-        </button>
-        <button class="vlf-del" onclick="delVerlauf(${e.id})" title="Löschen">×</button>
-      </div>
-    </div>`).join('');
-}
-
-function toggleStatus(id){
-  const arr=loadVerlauf();
-  const e=arr.find(x=>x.id===id); if(!e)return;
-  e.status=e.status==='erledigt'?'ausstehend':'erledigt';
-  saveVerlaufData(arr); renderVerlauf();
-avPopulateDropdown();
-}
-
-function setNotiz(id,val){
-  const arr=loadVerlauf();
-  const e=arr.find(x=>x.id===id); if(!e)return;
-  e.notiz=val; saveVerlaufData(arr);
-}
-
-function delVerlauf(id){
-  if(!confirm('Eintrag löschen?'))return;
-  saveVerlaufData(loadVerlauf().filter(e=>e.id!==id));
-  renderVerlauf();
-avPopulateDropdown(); toast('✓ Gelöscht');
-}
-
-function clearVerlauf(){
-  if(!confirm('Gesamten Verlauf löschen? Diese Aktion kann nicht rückgängig gemacht werden.'))return;
-  saveVerlaufData([]); renderVerlauf();
-avPopulateDropdown(); toast('✓ Verlauf geleert');
-}
-
-function showEmailPreview(id){
-  const e=loadVerlauf().find(x=>x.id===id); if(!e)return;
-  const w=window.open('','_blank','width=640,height=700');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>${e.subj}</title>
-<style>body{font-family:'Segoe UI',sans-serif;padding:24px;max-width:600px;margin:0 auto;color:#1A1A18;line-height:1.7;}
-.meta{font-size:12px;color:#888;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:16px;}
-pre{white-space:pre-wrap;font-family:'Segoe UI',sans-serif;font-size:13px;}</style></head>
-<body><div class="meta">
-<strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de<br>
-<strong>Betreff:</strong> ${e.subj}<br>
-<strong>Gesendet:</strong> ${e.gesendetAm}
-</div><pre>${e.body}</pre></body></html>`);
-  w.document.close();
-}
-
-function exportVerlauf(){
-  const arr=loadVerlauf();
-  let csv='Datum;Typ;Mitarbeiter;Personalnr.;Filiale;Zeitraum;Betreff;Status;Notiz\n';
-  arr.forEach(e=>{
-    csv+=`"${e.gesendetAm}";"${e.typ}";"${e.empName||''}";"${e.empId||''}";"${e.filiale||''}";"${e.zeitraum||''}";"${e.subj}";"${e.status}";"${e.notiz||''}"\n`;
-  });
-  const a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download='Verlauf_SushiCircle.csv'; a.click();
-}
-
-// ─── INIT ────────────────────────────────────────────────────
-restoreSig();
-populateDropdowns();
-addRow();
-updateKrank();
-updateUrlaub();
-updateStunden();
-renderVerlauf();
-avPopulateDropdown();
 </script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script>
 if("serviceWorker" in navigator){
-  window.addEventListener("load", () => {
+  window.addEventListener("load",function(){
     navigator.serviceWorker.register("sw.js")
-      .then(r => console.log("SW registered:", r.scope))
-      .catch(e => console.log("SW error:", e));
+      .then(function(r){console.log("SW ok",r.scope);})
+      .catch(function(e){console.log("SW err",e);});
   });
 }
 </script>
 </body>
 </html>
+
