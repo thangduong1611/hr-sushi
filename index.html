@@ -210,6 +210,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
   <button class="tab" onclick="sw('stunden',this)">⏱ Stundennachweis</button>
   <button class="tab" onclick="sw('dt',this)">🚆 Deutschlandticket</button>
   <button class="tab" onclick="sw('emp',this)">👥 Mitarbeiter</button>
+  <button class="tab" onclick="sw('av',this)">📝 Änderungsvereinbarung</button>
   <button class="tab" onclick="sw('verlauf',this)">📋 Verlauf</button>
   <button class="tab" onclick="sw('settings',this)">⚙ Einstellungen</button>
 </div>
@@ -392,6 +393,112 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
   </div>
 </div>
 
+<!-- ===== ÄNDERUNGSVEREINBARUNG ===== -->
+<div id="panel-av" class="panel">
+  <div class="card">
+    <div class="card-title">📝 Änderungsvereinbarung <span class="badge badge-red">PDF-Vorschau & Druck</span></div>
+    <div class="info">Mitarbeiter wählen → Felder ausfüllen → Unterschrift setzen → PDF drucken/speichern.</div>
+
+    <label>Mitarbeiter</label>
+    <select id="av-emp" onchange="avFillEmp()">
+      <option value="">— Mitarbeiter wählen —</option>
+    </select>
+    <div class="row2">
+      <div><label>Name (Frau/Herr)</label><input type="text" id="av-name" placeholder="Vorname Nachname" oninput="avUpdate()"></div>
+      <div><label>Personalnummer</label><input type="text" id="av-pid" placeholder="z.B. 341458" oninput="avUpdate()"></div>
+    </div>
+    <div class="row2">
+      <div><label>Straße</label><input type="text" id="av-strasse" placeholder="Musterstr. 1" oninput="avUpdate()"></div>
+      <div><label>PLZ, Ort</label><input type="text" id="av-plz" placeholder="30159 Hannover" oninput="avUpdate()"></div>
+    </div>
+
+    <label style="margin-top:16px">Art der Änderung</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+      <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer">
+        <input type="checkbox" id="av-chk-gehalt" onchange="avToggle()"> Gehalt
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer">
+        <input type="checkbox" id="av-chk-verlaeng" onchange="avToggle()"> Verlängerung
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer">
+        <input type="checkbox" id="av-chk-stunde" onchange="avToggle()"> Stundenlohn
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer">
+        <input type="checkbox" id="av-chk-wochen" onchange="avToggle()"> Anpassung Wochenstunden
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin:0;text-transform:none;font-size:13px;font-weight:400;letter-spacing:0;cursor:pointer">
+        <input type="checkbox" id="av-chk-sonst" onchange="avToggle()"> Sonstiges
+      </label>
+    </div>
+
+    <!-- GEHALT -->
+    <div id="av-sec-gehalt" style="display:none;margin-top:14px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">💶 Gehalt</div>
+      <div class="row3">
+        <div><label>Bisheriges Gehalt (€)</label><input type="text" id="av-g-alt" placeholder="2000" oninput="avUpdate()"></div>
+        <div><label>Wirkung ab</label><input type="date" id="av-g-ab" oninput="avUpdate()"></div>
+        <div><label>Neues Gehalt (€)</label><input type="text" id="av-g-neu" placeholder="2200" oninput="avUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- VERLÄNGERUNG -->
+    <div id="av-sec-verlaeng" style="display:none;margin-top:14px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">📅 Verlängerung</div>
+      <div class="row2">
+        <div><label>Verlängerung um (Monate)</label><input type="text" id="av-v-monate" placeholder="12" oninput="avUpdate()"></div>
+        <div><label>Verlängert bis</label><input type="date" id="av-v-bis" oninput="avUpdate()"></div>
+      </div>
+      <label>Unbefristet ab (optional)</label>
+      <input type="date" id="av-v-unbefristet" oninput="avUpdate()">
+    </div>
+
+    <!-- STUNDENLOHN -->
+    <div id="av-sec-stunde" style="display:none;margin-top:14px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">⏱ Stundenlohn</div>
+      <div class="row3">
+        <div><label>Bisheriger Stundenlohn (€)</label><input type="text" id="av-s-alt" placeholder="12.00" oninput="avUpdate()"></div>
+        <div><label>Wirkung ab</label><input type="date" id="av-s-ab" oninput="avUpdate()"></div>
+        <div><label>Neuer Stundenlohn (€)</label><input type="text" id="av-s-neu" placeholder="13.00" oninput="avUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- WOCHENSTUNDEN -->
+    <div id="av-sec-wochen" style="display:none;margin-top:14px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">📊 Anpassung Wochenstunden</div>
+      <div class="row3">
+        <div><label>Bisher (Std/Woche)</label><input type="text" id="av-w-alt" placeholder="20" oninput="avUpdate()"></div>
+        <div><label>Geändert ab</label><input type="date" id="av-w-ab" oninput="avUpdate()"></div>
+        <div><label>Neu (Std/Woche)</label><input type="text" id="av-w-neu" placeholder="30" oninput="avUpdate()"></div>
+      </div>
+    </div>
+
+    <!-- SONSTIGES -->
+    <div id="av-sec-sonst" style="display:none;margin-top:14px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">📋 Sonstiges</div>
+      <textarea id="av-sonst-text" placeholder="Freitext..." style="min-height:100px" oninput="avUpdate()"></textarea>
+    </div>
+
+    <!-- UNTERSCHRIFT -->
+    <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">✍️ Unterschrift Arbeitgeber</div>
+      <p style="font-size:12px;color:var(--mut);margin-bottom:8px">Ort und Datum werden automatisch eingetragen (Hannover, heutiges Datum). Klicken Sie auf das Feld um zu unterschreiben.</p>
+      <canvas id="av-sig-canvas" width="340" height="100"
+        style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;max-width:100%"
+        onmousedown="avSigStart(event)" onmousemove="avSigDraw(event)" onmouseup="avSigEnd()"
+        ontouchstart="avSigStart(event)" ontouchmove="avSigDraw(event)" ontouchend="avSigEnd()">
+      </canvas>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-sm" onclick="avSigClear()">↺ Löschen</button>
+        <button class="btn btn-sm" onclick="avSigFromSaved()">📥 Gespeicherte Unterschrift laden</button>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-red" onclick="avPrint()" style="flex:1;justify-content:center;font-size:14px">🖨️ PDF drucken / speichern</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== VERLAUF ===== -->
 <div id="panel-verlauf" class="panel">
   <div class="card">
@@ -476,6 +583,8 @@ function sw(id, el) {
   document.getElementById('panel-'+id).classList.add('active');
   if(id==='emp') renderEmpTable();
   if(id==='verlauf') renderVerlauf();
+avPopulateDropdown();
+  if(id==='av') avPopulateDropdown();
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────
@@ -1002,6 +1111,271 @@ function mailto(p) {
   window.location.href=`mailto:${TO}?cc=${encodeURIComponent(CC)}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
 }
 
+// ─── ÄNDERUNGSVEREINBARUNG ───────────────────────────────────
+function avPopulateDropdown() {
+  const emps = loadEmps().filter(e=>e.active!==false);
+  const sel = document.getElementById('av-emp');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Mitarbeiter wählen —</option>';
+  emps.forEach((e,i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = e.name + '  [' + e.id + ']';
+    sel.appendChild(opt);
+  });
+  sel.value = cur;
+}
+
+function avFillEmp() {
+  const idx = document.getElementById('av-emp').value;
+  if(idx==='') return;
+  const e = loadEmps().filter(x=>x.active!==false)[idx];
+  if(!e) return;
+  document.getElementById('av-name').value = e.name;
+  document.getElementById('av-pid').value = e.id;
+}
+
+function avToggle() {
+  ['gehalt','verlaeng','stunde','wochen','sonst'].forEach(k => {
+    const chk = document.getElementById('av-chk-'+k);
+    document.getElementById('av-sec-'+k).style.display = chk.checked ? 'block' : 'none';
+  });
+}
+
+// Signature drawing on canvas
+let avDrawing = false, avLastX = 0, avLastY = 0;
+function avGetPos(ev, canvas) {
+  const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width;
+  const scaleY = canvas.height / r.height;
+  if(ev.touches) {
+    return {x:(ev.touches[0].clientX-r.left)*scaleX, y:(ev.touches[0].clientY-r.top)*scaleY};
+  }
+  return {x:(ev.clientX-r.left)*scaleX, y:(ev.clientY-r.top)*scaleY};
+}
+function avSigStart(ev) {
+  ev.preventDefault();
+  avDrawing = true;
+  const c = document.getElementById('av-sig-canvas');
+  const p = avGetPos(ev, c);
+  avLastX = p.x; avLastY = p.y;
+  const ctx = c.getContext('2d');
+  ctx.beginPath(); ctx.moveTo(p.x, p.y);
+}
+function avSigDraw(ev) {
+  if(!avDrawing) return;
+  ev.preventDefault();
+  const c = document.getElementById('av-sig-canvas');
+  const p = avGetPos(ev, c);
+  const ctx = c.getContext('2d');
+  ctx.strokeStyle = '#1A1A18';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  avLastX = p.x; avLastY = p.y;
+}
+function avSigEnd() { avDrawing = false; }
+function avSigClear() {
+  const c = document.getElementById('av-sig-canvas');
+  c.getContext('2d').clearRect(0,0,c.width,c.height);
+}
+function avSigFromSaved() {
+  if(!sigImg) { alert('Bitte zuerst Unterschrift-PNG in den Einstellungen hochladen.'); return; }
+  const c = document.getElementById('av-sig-canvas');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  const scale = Math.min(c.width/sigImg.width, c.height/sigImg.height) * 0.8;
+  const w = sigImg.width*scale, h = sigImg.height*scale;
+  ctx.drawImage(sigImg, (c.width-w)/2, (c.height-h)/2, w, h);
+}
+
+function avFmtDate(v) {
+  if(!v) return '___________';
+  const [y,m,d] = v.split('-');
+  return d+'.'+m+'.'+y;
+}
+
+function avTodayDE() {
+  const d = new Date();
+  return d.toLocaleDateString('de-DE', {day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function avSigDataUrl() {
+  const c = document.getElementById('av-sig-canvas');
+  // check if canvas has any drawing
+  const ctx = c.getContext('2d');
+  const px = ctx.getImageData(0,0,c.width,c.height).data;
+  const hasContent = px.some((v,i)=>i%4===3&&v>0);
+  return hasContent ? c.toDataURL('image/png') : null;
+}
+
+function avPrint() {
+  const name   = document.getElementById('av-name').value || '___________';
+  const pid    = document.getElementById('av-pid').value  || '___________';
+  const str    = document.getElementById('av-strasse').value || '___________';
+  const plz    = document.getElementById('av-plz').value    || '___________';
+
+  const chkG = document.getElementById('av-chk-gehalt').checked;
+  const chkV = document.getElementById('av-chk-verlaeng').checked;
+  const chkS = document.getElementById('av-chk-stunde').checked;
+  const chkW = document.getElementById('av-chk-wochen').checked;
+  const chkSo= document.getElementById('av-chk-sonst').checked;
+
+  const gAlt = document.getElementById('av-g-alt').value;
+  const gAb  = avFmtDate(document.getElementById('av-g-ab').value);
+  const gNeu = document.getElementById('av-g-neu').value;
+
+  const vMon = document.getElementById('av-v-monate').value;
+  const vBis = avFmtDate(document.getElementById('av-v-bis').value);
+  const vUnb = avFmtDate(document.getElementById('av-v-unbefristet').value);
+
+  const sAlt = document.getElementById('av-s-alt').value;
+  const sAb  = avFmtDate(document.getElementById('av-s-ab').value);
+  const sNeu = document.getElementById('av-s-neu').value;
+
+  const wAlt = document.getElementById('av-w-alt').value;
+  const wAb  = avFmtDate(document.getElementById('av-w-ab').value);
+  const wNeu = document.getElementById('av-w-neu').value;
+
+  const sonst= document.getElementById('av-sonst-text').value;
+  const sigUrl = avSigDataUrl();
+  const heute  = avTodayDE();
+
+  const chkBox = (checked) => checked
+    ? '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;background:#333;color:#fff;font-size:10px;line-height:14px;text-align:center;margin-right:6px">✓</span>'
+    : '<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;margin-right:6px">&nbsp;</span>';
+
+  const html = \`<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8">
+<title>Änderungsvereinbarung – \${name}</title>
+<style>
+  @page{size:A4;margin:20mm 20mm 20mm 20mm}
+  *{box-sizing:border-box}
+  body{font-family:'Times New Roman',serif;font-size:11pt;color:#000;max-width:170mm;margin:0 auto;padding:0}
+  .header-right{text-align:right;font-size:9pt;line-height:1.5;margin-bottom:8mm}
+  .logo{width:28mm;float:right;margin-bottom:2mm}
+  .title{font-size:16pt;font-weight:bold;text-decoration:underline;margin-bottom:6mm}
+  .pers-box{border:1.5px solid #000;padding:4px 10px;display:inline-block;min-width:50mm;font-size:10pt;margin-bottom:6mm;float:right}
+  .clearfix::after{content:'';display:table;clear:both}
+  .chk-row{margin:2mm 0;font-size:11pt}
+  .emp-block{margin:6mm 0}
+  .emp-row{margin:1.5mm 0}
+  .field-line{display:inline-block;min-width:55mm;border-bottom:1px solid #000;padding:0 2mm}
+  .section{margin:5mm 0;padding:4mm 0;border-top:1.5px solid #000}
+  .section-title{font-weight:bold;text-decoration:underline;margin-bottom:3mm;font-size:11pt}
+  .sig-area{margin-top:16mm;display:flex;gap:20mm}
+  .sig-col{flex:1}
+  .sig-line{border-top:1px solid #000;margin-top:12mm;padding-top:2mm;font-size:9pt}
+  .sig-img{max-width:55mm;max-height:18mm;display:block;margin-bottom:2mm}
+  .ort-datum{font-size:10pt;margin-bottom:1mm}
+  .warn{font-weight:bold;font-size:10pt}
+  .sonst-lines{min-height:30mm;border-bottom:1px solid #ddd;margin:2mm 0;white-space:pre-wrap;font-size:10pt}
+  @media print{body{max-width:none}}
+</style>
+</head><body>
+
+<div class="clearfix">
+  <div class="header-right" style="float:right;text-align:right;font-size:9pt;line-height:1.6">
+    <strong>Sushi Circle Gastronomie GmbH</strong><br>
+    Frankfurter Str. 74-76<br>
+    63263 Neu-Isenburg
+  </div>
+</div>
+
+<div style="margin-top:8mm" class="clearfix">
+  <div style="float:right;margin-bottom:4mm">
+    <div class="pers-box"><strong>Pers.-Nr.</strong>&nbsp;&nbsp;\${pid}</div>
+  </div>
+  <div class="title">ÄNDERUNGSVEREINBARUNG</div>
+</div>
+
+<div class="chk-row">\${chkBox(chkG)} Gehalt</div>
+<div class="chk-row">\${chkBox(chkV)} Verlängerung</div>
+<div class="chk-row">\${chkBox(chkS)} Stundenlohn</div>
+<div class="chk-row">\${chkBox(chkW)} Anpassung Wochenstunden</div>
+<div class="chk-row">\${chkBox(chkSo)} Sonstiges</div>
+
+<div class="emp-block" style="margin-top:8mm">
+  <div style="margin-bottom:3mm">Das derzeitige Arbeitsverhältnis zwischen</div>
+  <div class="emp-row">Frau / Herr: <span class="field-line">\${name}</span></div>
+  <div class="emp-row" style="margin-top:2mm">Straße: <span class="field-line">\${str}</span></div>
+  <div class="emp-row" style="margin-top:2mm">PLZ, Ort: <span class="field-line">\${plz}</span></div>
+</div>
+
+<div style="text-align:center;font-weight:bold;margin:5mm 0">und</div>
+
+<div style="font-weight:bold;line-height:1.7">
+  Sushi Circle Gastronomie GmbH<br>
+  Frankfurter Str. 74-76<br>
+  63263 Neu-Isenburg
+</div>
+
+<div style="margin:5mm 0">Wird wie folgt geändert:</div>
+
+\${chkG ? \`<div class="section">
+  <div class="section-title">Gehalt:</div>
+  <div>Das vereinbarte Gehalt in Höhe von <span class="field-line">\${gAlt}&nbsp;€</span> wird mit Wirkung ab
+  <span class="field-line">\${gAb}</span> auf ein Gehalt in Höhe von <span class="field-line">\${gNeu}&nbsp;€</span> geändert.</div>
+</div>\` : ''}
+
+\${chkV ? \`<div class="section">
+  <div class="section-title">Verlängerung:</div>
+  <div>Das Arbeitsverhältnis wird um weitere <span class="field-line">\${vMon}&nbsp;Monate</span>, bis zum
+  <span class="field-line">\${vBis}</span> verlängert.</div>
+  \${vUnb !== '___________' ? \`<div style="margin-top:3mm">Das Arbeitsverhältnis geht ab dem <span class="field-line">\${vUnb}</span> in ein unbefristetes Arbeitsverhältnis über.</div>\` : ''}
+</div>\` : ''}
+
+\${chkS ? \`<div class="section">
+  <div class="section-title">Stundenlohn:</div>
+  <div>Der vereinbarte Stundenlohn in Höhe von <span class="field-line">\${sAlt}&nbsp;€</span> wird mit Wirkung ab
+  dem <span class="field-line">\${sAb}</span> auf einen Stundenlohn in Höhe von <span class="field-line">\${sNeu}&nbsp;€</span> geändert.</div>
+  <div class="warn" style="margin-top:2mm">(Änderung des Stundenlohns ist immer nur zum 01. Eines Monats möglich!)</div>
+</div>\` : ''}
+
+\${chkW ? \`<div class="section">
+  <div class="section-title">Anpassung Wochenstunden:</div>
+  <div>Die bisher vereinbarte durchschnittliche Wochenarbeitszeit von <span class="field-line">\${wAlt}&nbsp;Stunden</span>
+  wird ab <span class="field-line">\${wAb}</span> auf <span class="field-line">\${wNeu}&nbsp;Stunden</span>
+  durchschnittliche Wochenarbeitszeit geändert.</div>
+  <div class="warn" style="margin-top:2mm">ACHTUNG! Die Änderung der Wochenarbeitszeit kann nur zu einem Montag erfolgen!</div>
+</div>\` : ''}
+
+\${chkSo ? \`<div class="section">
+  <div class="section-title">Sonstiges:</div>
+  <div class="sonst-lines">\${sonst || ''}</div>
+</div>\` : ''}
+
+<div class="section" style="border-top:none;margin-top:4mm">
+  <div style="font-size:10pt">Alle Übrigen Bestandteile des bisherigen Arbeitsvertrages behalten Ihre Wirksamkeit.</div>
+</div>
+
+<div class="sig-area">
+  <div class="sig-col">
+    <div class="sig-line">
+      <div style="font-size:10pt;color:#555;margin-bottom:1mm">Ort, Datum</div>
+    </div>
+    <div style="height:20mm"></div>
+    <div class="sig-line">Unterschrift <strong>Arbeitnehmer</strong></div>
+  </div>
+  <div class="sig-col">
+    <div style="font-size:10pt;margin-bottom:1mm">Hannover, \${heute}</div>
+    \${sigUrl ? \`<img src="\${sigUrl}" class="sig-img">\` : '<div style="height:18mm"></div>'}
+    <div style="border-top:1px solid #000;padding-top:2mm;font-size:9pt">Unterschrift <strong>Arbeitgeber</strong></div>
+  </div>
+</div>
+
+<script>window.onload=()=>{window.print();}<\/script>
+</body></html>\`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+function avUpdate() {} // placeholder for live preview if needed
+
 // ─── VERLAUF ─────────────────────────────────────────────────
 const TYPE_ICONS = {Krankmeldung:'🏥',Urlaubsantrag:'🌴',Stundennachweis:'⏱',Deutschlandticket:'🚆'};
 const TYPE_MAP   = {k:'Krankmeldung',u:'Urlaubsantrag',s:'Stundennachweis',dt:'Deutschlandticket'};
@@ -1115,6 +1489,7 @@ function toggleStatus(id){
   const e=arr.find(x=>x.id===id); if(!e)return;
   e.status=e.status==='erledigt'?'ausstehend':'erledigt';
   saveVerlaufData(arr); renderVerlauf();
+avPopulateDropdown();
 }
 
 function setNotiz(id,val){
@@ -1126,12 +1501,14 @@ function setNotiz(id,val){
 function delVerlauf(id){
   if(!confirm('Eintrag löschen?'))return;
   saveVerlaufData(loadVerlauf().filter(e=>e.id!==id));
-  renderVerlauf(); toast('✓ Gelöscht');
+  renderVerlauf();
+avPopulateDropdown(); toast('✓ Gelöscht');
 }
 
 function clearVerlauf(){
   if(!confirm('Gesamten Verlauf löschen? Diese Aktion kann nicht rückgängig gemacht werden.'))return;
-  saveVerlaufData([]); renderVerlauf(); toast('✓ Verlauf geleert');
+  saveVerlaufData([]); renderVerlauf();
+avPopulateDropdown(); toast('✓ Verlauf geleert');
 }
 
 function showEmailPreview(id){
@@ -1169,6 +1546,7 @@ updateKrank();
 updateUrlaub();
 updateStunden();
 renderVerlauf();
+avPopulateDropdown();
 </script>
 <script>
 if("serviceWorker" in navigator){
