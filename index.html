@@ -292,18 +292,35 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
       </div>
 
       <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
-        <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift Arbeitgeber</div>
-        <p style="font-size:12px;color:var(--mut);margin-bottom:8px">Mit Finger zeichnen oder gespeicherte Unterschrift laden.</p>
-        <canvas id="u-sig-canvas" width="400" height="110"
-          style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
-          onmousedown="uSigStart(event)" onmousemove="uSigDraw(event)" onmouseup="uSigEnd()" onmouseleave="uSigEnd()"
-          ontouchstart="uSigStart(event)" ontouchmove="uSigDraw(event)" ontouchend="uSigEnd()">
-        </canvas>
-        <div class="btn-row" style="margin-top:8px">
-          <button class="btn btn-sm" onclick="uSigClear()">↺ Löschen</button>
-          <button class="btn btn-sm" onclick="uSigFromSaved()">📥 Gespeicherte laden</button>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">✍️ Unterschriften</div>
+      <div class="row2" style="gap:10px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITNEHMER</div>
+          <label style="margin:0 0 4px">Ort, Datum</label>
+          <input type="text" id="u-ort-an" placeholder="Ort, Datum" style="margin-bottom:6px">
+          <canvas id="u-sig-an" width="300" height="90"
+            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+            onmousedown="sigStart(event,'u-sig-an')" onmousemove="sigDraw(event,'u-sig-an')" onmouseup="sigEnd('u-sig-an')" onmouseleave="sigEnd('u-sig-an')"
+            ontouchstart="sigStart(event,'u-sig-an')" ontouchmove="sigDraw(event,'u-sig-an')" ontouchend="sigEnd('u-sig-an')">
+          </canvas>
+          <button class="btn btn-sm" onclick="sigClear('u-sig-an')" style="margin-top:5px">↺ Löschen</button>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITGEBER</div>
+          <label style="margin:0 0 4px">Ort, Datum</label>
+          <input type="text" id="u-ort-ag" style="margin-bottom:6px">
+          <canvas id="u-sig-canvas" width="300" height="90"
+            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+            onmousedown="uSigStart(event)" onmousemove="uSigDraw(event)" onmouseup="uSigEnd()" onmouseleave="uSigEnd()"
+            ontouchstart="uSigStart(event)" ontouchmove="uSigDraw(event)" ontouchend="uSigEnd()">
+          </canvas>
+          <div class="btn-row" style="margin-top:5px">
+            <button class="btn btn-sm" onclick="uSigClear()">↺ Löschen</button>
+            <button class="btn btn-sm" onclick="uSigFromSaved()">📥 Laden</button>
+          </div>
         </div>
       </div>
+    </div>
 
       <div class="btn-row" style="margin-top:14px">
         <button class="btn btn-red" onclick="uGeneratePDF()" style="flex:1;justify-content:center;font-size:14px">⬇ PDF herunterladen</button>
@@ -350,15 +367,33 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
       <!-- Photo canvas with signature placement -->
       <div id="up-canvas-sec" style="display:none;margin-top:14px">
         <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift zeichnen</div>
-          <canvas id="up-sig-canvas" width="400" height="100"
-            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
-            onmousedown="upSigStart(event)" onmousemove="upSigDraw(event)" onmouseup="upSigEnd()" onmouseleave="upSigEnd()"
-            ontouchstart="upSigStart(event)" ontouchmove="upSigDraw(event)" ontouchend="upSigEnd()">
-          </canvas>
-          <div class="btn-row" style="margin-top:8px">
-            <button class="btn btn-sm" onclick="upSigClear()">↺ Löschen</button>
-            <button class="btn btn-sm" onclick="upSigFromSaved()">📥 Gespeicherte laden</button>
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px">✍️ Unterschriften</div>
+          <div class="row2" style="gap:10px">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITNEHMER</div>
+              <label style="margin:0 0 4px">Ort, Datum</label>
+              <input type="text" id="up-ort-an" placeholder="Ort, Datum" style="margin-bottom:6px">
+              <canvas id="up-sig-an" width="300" height="80"
+                style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+                onmousedown="sigStart(event,'up-sig-an')" onmousemove="sigDraw(event,'up-sig-an')" onmouseup="sigEnd('up-sig-an')" onmouseleave="sigEnd('up-sig-an')"
+                ontouchstart="sigStart(event,'up-sig-an')" ontouchmove="sigDraw(event,'up-sig-an')" ontouchend="sigEnd('up-sig-an')">
+              </canvas>
+              <button class="btn btn-sm" onclick="sigClear('up-sig-an')" style="margin-top:5px">↺ Löschen</button>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITGEBER</div>
+              <label style="margin:0 0 4px">Ort, Datum</label>
+              <input type="text" id="up-ort-ag" style="margin-bottom:6px">
+              <canvas id="up-sig-canvas" width="300" height="80"
+                style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+                onmousedown="upSigStart(event)" onmousemove="upSigDraw(event)" onmouseup="upSigEnd()" onmouseleave="upSigEnd()"
+                ontouchstart="upSigStart(event)" ontouchmove="upSigDraw(event)" ontouchend="upSigEnd()">
+              </canvas>
+              <div class="btn-row" style="margin-top:5px">
+                <button class="btn btn-sm" onclick="upSigClear()">↺ Löschen</button>
+                <button class="btn btn-sm" onclick="upSigFromSaved()">📥 Laden</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -564,16 +599,33 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
     </div>
 
     <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
-      <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift Arbeitgeber</div>
-      <p style="font-size:12px;color:var(--mut);margin-bottom:8px">Mit Finger zeichnen oder gespeicherte Unterschrift laden. Ort &amp; Datum (Hannover, heute) werden automatisch eingetragen.</p>
-      <canvas id="av-sig-canvas" width="400" height="110"
-        style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
-        onmousedown="avSigStart(event)" onmousemove="avSigDraw(event)" onmouseup="avSigEnd()" onmouseleave="avSigEnd()"
-        ontouchstart="avSigStart(event)" ontouchmove="avSigDraw(event)" ontouchend="avSigEnd()">
-      </canvas>
-      <div class="btn-row" style="margin-top:8px">
-        <button class="btn btn-sm" onclick="avSigClear()">↺ Löschen</button>
-        <button class="btn btn-sm" onclick="avSigFromSaved()">📥 Gespeicherte laden</button>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">✍️ Unterschriften</div>
+      <div class="row2" style="gap:10px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITNEHMER</div>
+          <label style="margin:0 0 4px">Ort, Datum</label>
+          <input type="text" id="av-ort-an" placeholder="Ort, Datum" style="margin-bottom:6px">
+          <canvas id="av-sig-an" width="300" height="90"
+            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+            onmousedown="sigStart(event,'av-sig-an')" onmousemove="sigDraw(event,'av-sig-an')" onmouseup="sigEnd('av-sig-an')" onmouseleave="sigEnd('av-sig-an')"
+            ontouchstart="sigStart(event,'av-sig-an')" ontouchmove="sigDraw(event,'av-sig-an')" ontouchend="sigEnd('av-sig-an')">
+          </canvas>
+          <button class="btn btn-sm" onclick="sigClear('av-sig-an')" style="margin-top:5px">↺ Löschen</button>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px">ARBEITGEBER</div>
+          <label style="margin:0 0 4px">Ort, Datum</label>
+          <input type="text" id="av-ort-ag" style="margin-bottom:6px">
+          <canvas id="av-sig-canvas" width="300" height="90"
+            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+            onmousedown="avSigStart(event)" onmousemove="avSigDraw(event)" onmouseup="avSigEnd()" onmouseleave="avSigEnd()"
+            ontouchstart="avSigStart(event)" ontouchmove="avSigDraw(event)" ontouchend="avSigEnd()">
+          </canvas>
+          <div class="btn-row" style="margin-top:5px">
+            <button class="btn btn-sm" onclick="avSigClear()">↺ Löschen</button>
+            <button class="btn btn-sm" onclick="avSigFromSaved()">📥 Laden</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -670,6 +722,7 @@ function sw(id, el) {
   if(id==='emp') renderEmpTable();
   if(id==='verlauf') renderVerlauf();
 avPopulateDropdown();
+initOrtDatumFields();
   if(id==='av') avPopulateDropdown();
 }
 
@@ -1313,6 +1366,57 @@ function mailto(p) {
   window.location.href=`mailto:${TO}?cc=${encodeURIComponent(CC)}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
 }
 
+// ─── SHARED SIGNATURE UTILITIES ─────────────────────────────
+var _sigDrawing = {};
+
+function sigStart(ev, canvasId) {
+  ev.preventDefault();
+  _sigDrawing[canvasId] = true;
+  var c = document.getElementById(canvasId);
+  var r = c.getBoundingClientRect();
+  var sx = c.width/r.width, sy = c.height/r.height;
+  var src = ev.touches ? ev.touches[0] : ev;
+  var ctx = c.getContext('2d');
+  ctx.beginPath();
+  ctx.moveTo((src.clientX-r.left)*sx, (src.clientY-r.top)*sy);
+}
+function sigDraw(ev, canvasId) {
+  if(!_sigDrawing[canvasId]) return;
+  ev.preventDefault();
+  var c = document.getElementById(canvasId);
+  var r = c.getBoundingClientRect();
+  var sx = c.width/r.width, sy = c.height/r.height;
+  var src = ev.touches ? ev.touches[0] : ev;
+  var ctx = c.getContext('2d');
+  ctx.strokeStyle = '#1A1A18'; ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.lineTo((src.clientX-r.left)*sx, (src.clientY-r.top)*sy);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo((src.clientX-r.left)*sx, (src.clientY-r.top)*sy);
+}
+function sigEnd(canvasId) { _sigDrawing[canvasId] = false; }
+function sigClear(canvasId) {
+  var c = document.getElementById(canvasId);
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+}
+function sigHasContent(canvasId) {
+  var c = document.getElementById(canvasId);
+  if(!c) return false;
+  var d = c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+  for(var i=3; i<d.length; i+=4){ if(d[i]>10) return true; }
+  return false;
+}
+
+function initOrtDatumFields() {
+  var heute = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var hannover = 'Hannover, ' + heute;
+  ['u-ort-ag','up-ort-ag','av-ort-ag'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && !el.value) el.value = hannover;
+  });
+}
+
 // ─── URLAUBSANTRAG PHOTO MODE ────────────────────────────────
 var upDocImg = null;      // original loaded photo
 var upDocPixels = null;   // backup of clean canvas
@@ -1439,16 +1543,26 @@ function upPlaceSigTouch(ev) {
   _upDrawSigAt(ctx, cv, x, y);
 }
 function _upDrawSigAt(ctx, cv, x, y) {
-  var today = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
-  var datumText = 'Hannover, ' + today;
-
-  // Font size relative to canvas width
   var fs = Math.max(14, Math.round(cv.width * 0.028));
   ctx.font = 'bold ' + fs + 'px Arial, sans-serif';
   ctx.fillStyle = '#000000';
-  ctx.fillText(datumText, x, y - (upSigHasContent() ? Math.round(cv.width*0.06)+8 : 6));
 
-  // Draw signature
+  // Arbeitnehmer sig: place at x-offset to the left
+  if(sigHasContent('up-sig-an')) {
+    var sanC = document.getElementById('up-sig-an');
+    var sanW = Math.round(cv.width * 0.20);
+    var sanH = Math.round(sanC.height/sanC.width * sanW);
+    var xAN = Math.max(10, x - sanW - 30);
+    var ortAN = document.getElementById('up-ort-an').value;
+    if(ortAN) ctx.fillText(ortAN, xAN, y - sanH - 4);
+    ctx.drawImage(sanC, xAN, y - sanH, sanW, sanH);
+  }
+
+  // Arbeitgeber sig at tap position
+  var ortAG = document.getElementById('up-ort-ag').value ||
+    ('Hannover, ' + new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}));
+  ctx.fillText(ortAG, x, y - (upSigHasContent() ? Math.round(cv.width*0.06)+8 : 6));
+
   var sigSrc = upSigHasContent() ? document.getElementById('up-sig-canvas') : sigImg;
   if(sigSrc) {
     var sigW = Math.round(cv.width * 0.22);
@@ -1640,11 +1754,21 @@ function uGeneratePDF() {
     fillF(F.einsatz_am,   fmtDate(document.getElementById('u-einsatz').value));
     fillF(F.rufnummer,    document.getElementById('u-rufnummer').value);
 
-    // Datum + Unterschrift Arbeitgeber
+    // Ort/Datum + Unterschriften
     ctx.fillStyle='#000000';
     ctx.font='22px Arial,sans-serif';
-    ctx.fillText('Hannover, '+new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}), U_SIG_DATUM_X, U_SIG_DATUM_Y);
 
+    // Arbeitnehmer: left sig line (x=115, y=1250 approx)
+    var ortAN = document.getElementById('u-ort-an').value;
+    if(ortAN) ctx.fillText(ortAN, 116, 1242);
+    if(sigHasContent('u-sig-an')) {
+      var sanC = document.getElementById('u-sig-an');
+      ctx.drawImage(sanC, 116, 1185, 200, 55);
+    }
+
+    // Arbeitgeber: right sig line
+    var ortAG = document.getElementById('u-ort-ag').value;
+    if(ortAG) ctx.fillText(ortAG, U_SIG_DATUM_X, U_SIG_DATUM_Y);
     if(uSigHasContent()) {
       var sigC=document.getElementById('u-sig-canvas');
       ctx.drawImage(sigC, U_SIG_X, U_SIG_Y, U_SIG_W, U_SIG_H);
@@ -1904,12 +2028,19 @@ function avGeneratePDF() {
         });
       }
 
-      // Datum (Hannover, today)
+      // Arbeitnehmer Ort/Datum + Unterschrift (left)
+      var avOrtAN = document.getElementById('av-ort-an').value;
       ctx2.fillStyle='#000000';
       ctx2.font = AV_FONT_DT+'px Arial, sans-serif';
-      ctx2.fillText('Hannover, '+avTodayDE(), AV_SIG_X, AV_DATUM_Y);
+      if(avOrtAN) ctx2.fillText(avOrtAN, 116, AV_DATUM_Y);
+      if(sigHasContent('av-sig-an')) {
+        var sanC = document.getElementById('av-sig-an');
+        ctx2.drawImage(sanC, 116, AV_SIG_Y, 200, 55);
+      }
 
-      // Signature
+      // Arbeitgeber Ort/Datum + Unterschrift (right)
+      var avOrtAG = document.getElementById('av-ort-ag').value || ('Hannover, '+avTodayDE());
+      ctx2.fillText(avOrtAG, AV_SIG_X, AV_DATUM_Y);
       if(avSigHasContent()) {
         var sigC = document.getElementById('av-sig-canvas');
         ctx2.drawImage(sigC, AV_SIG_X, AV_SIG_Y, AV_SIG_W, AV_SIG_H);
@@ -2186,6 +2317,7 @@ updateUrlaub();
 updateStunden();
 renderVerlauf();
 avPopulateDropdown();
+initOrtDatumFields();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
