@@ -1677,8 +1677,13 @@ var URLAUB_FIELDS = {
   einsatz_am:   {x0:320,  y0:556, x1:520,  y1:586, fs:20},
   rufnummer:    {x0:775,  y0:563, x1:1020, y1:595, fs:20}
 };
-var U_SIG_DATUM_X=116, U_SIG_DATUM_Y=1242;
-var U_SIG_X=679, U_SIG_Y=1195, U_SIG_W=280, U_SIG_H=73;
+// Urlaub sig coords (2x scale) - confirmed from scan
+var U_AN_ORT_Y=1080, U_AG_ORT_Y=1240;  // Ort/Datum baselines
+var U_SIG_X=683, U_SIG_W=260, U_SIG_H=58;
+var U_AN_SIG_Y=1050, U_AG_SIG_Y=1210;
+// Legacy aliases
+var U_SIG_DATUM_X=116, U_SIG_DATUM_Y=1080;
+var U_SIG_Y=1050;
 
 function uFillEmp() {
   var idx = document.getElementById('u-emp').value;
@@ -1758,20 +1763,20 @@ function uGeneratePDF() {
     ctx.fillStyle='#000000';
     ctx.font='22px Arial,sans-serif';
 
-    // Arbeitnehmer: left sig line (x=115, y=1250 approx)
+    // AN: Ort/Datum x=116 y=1080, Sig x=683 y=1050-1108
     var ortAN = document.getElementById('u-ort-an').value;
-    if(ortAN) ctx.fillText(ortAN, 116, 1242);
+    if(ortAN) ctx.fillText(ortAN, 116, 1080);
     if(sigHasContent('u-sig-an')) {
       var sanC = document.getElementById('u-sig-an');
-      ctx.drawImage(sanC, 116, 1185, 200, 55);
+      ctx.drawImage(sanC, 683, 1050, 260, 58);
     }
 
-    // Arbeitgeber: right sig line
+    // AG: Ort/Datum x=116 y=1240, Sig x=683 y=1210-1268
     var ortAG = document.getElementById('u-ort-ag').value;
-    if(ortAG) ctx.fillText(ortAG, U_SIG_DATUM_X, U_SIG_DATUM_Y);
+    if(ortAG) ctx.fillText(ortAG, 116, 1240);
     if(uSigHasContent()) {
       var sigC=document.getElementById('u-sig-canvas');
-      ctx.drawImage(sigC, U_SIG_X, U_SIG_Y, U_SIG_W, U_SIG_H);
+      ctx.drawImage(sigC, 683, 1210, 260, 58);
     }
 
     // Export PDF via jsPDF
@@ -1854,11 +1859,21 @@ var AV_FIELDS_P2 = {
   w_neu: {x0:604, y0:576, x1:794, y1:614,  fs:22},
   sonst: {x0:139, y0:870, x1:1060,y1:1182, fs:22}
 };
-var AV_DATUM_Y  = 1313;
-var AV_SIG_X    = 638;
-var AV_SIG_Y    = 1407;
-var AV_SIG_W    = 380;
-var AV_SIG_H    = 120;
+// AV Signature coordinates (2x scale)
+// Line 1 (shared Ort/Datum line): y=1369
+// Line 2 (Unterschrift AG line):  y=1486
+// AN: Ort/Datum above line1, sig between line1 and line2
+// AG: Ort/Datum above line1, sig between line1 and line2 (right col)
+var AV_AN_ORT_X  = 142;   // AN Ort/Datum x
+var AV_AG_ORT_X  = 639;   // AG Ort/Datum x
+var AV_ORT_Y     = 1328;  // Ort/Datum text baseline (above line y=1369)
+var AV_AN_SIG_X  = 142;   // AN sig x
+var AV_AN_SIG_W  = 330;   // AN sig width
+var AV_AG_SIG_X  = 679;   // AG sig x (confirmed 5cm right)
+var AV_AG_SIG_W  = 280;   // AG sig width
+var AV_SIG_TOP   = 1410;  // sig top (between labels y=1402 and line y=1486)
+var AV_SIG_BOT   = 1467;  // sig bottom (19px above line y=1486)
+var AV_SIG_H     = 57;    // = SIG_BOT - SIG_TOP
 var AV_FONT_SZ  = 28;  // normal fields
 var AV_FONT_SM  = 22;  // smaller fields
 var AV_FONT_DT  = 22;  // datum
@@ -2028,22 +2043,23 @@ function avGeneratePDF() {
         });
       }
 
-      // Arbeitnehmer Ort/Datum + Unterschrift (left)
-      var avOrtAN = document.getElementById('av-ort-an').value;
       ctx2.fillStyle='#000000';
       ctx2.font = AV_FONT_DT+'px Arial, sans-serif';
-      if(avOrtAN) ctx2.fillText(avOrtAN, 116, AV_DATUM_Y);
+
+      // AN: Ort/Datum left, sig same row right
+      var avOrtAN = document.getElementById('av-ort-an').value;
+      if(avOrtAN) ctx2.fillText(avOrtAN, AV_AN_ORT_X, AV_ORT_Y);
       if(sigHasContent('av-sig-an')) {
         var sanC = document.getElementById('av-sig-an');
-        ctx2.drawImage(sanC, 116, AV_SIG_Y, 200, 55);
+        ctx2.drawImage(sanC, AV_AN_SIG_X, AV_SIG_TOP, AV_AN_SIG_W, AV_SIG_H);
       }
 
-      // Arbeitgeber Ort/Datum + Unterschrift (right)
+      // AG: Ort/Datum right col, sig same row further right
       var avOrtAG = document.getElementById('av-ort-ag').value || ('Hannover, '+avTodayDE());
-      ctx2.fillText(avOrtAG, AV_SIG_X, AV_DATUM_Y);
+      ctx2.fillText(avOrtAG, AV_AG_ORT_X, AV_ORT_Y);
       if(avSigHasContent()) {
         var sigC = document.getElementById('av-sig-canvas');
-        ctx2.drawImage(sigC, AV_SIG_X, AV_SIG_Y, AV_SIG_W, AV_SIG_H);
+        ctx2.drawImage(sigC, AV_AG_SIG_X, AV_SIG_TOP, AV_AG_SIG_W, AV_SIG_H);
       }
 
       // ── Export to PDF via jsPDF ──
