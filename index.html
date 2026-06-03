@@ -254,60 +254,146 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
 
 <!-- ===== URLAUBSANTRAG ===== -->
 <div id="panel-urlaub" class="panel">
-  <div class="card">
-    <div class="card-title">🌴 Urlaubsantrag <span class="badge badge-blu">PDF-Export + Unterschrift</span></div>
-    <div class="info">Mitarbeiter wählen → Daten ausfüllen → Unterschrift zeichnen → PDF teilen.</div>
 
-    <label>Mitarbeiter</label>
-    <select id="u-emp" onchange="uFillEmp()">
-      <option value="">— Mitarbeiter wählen —</option>
-    </select>
-    <div class="row2">
-      <div><label>Name, Vorname</label><input type="text" id="u-name" placeholder="z.B. Nguyen Van A" oninput="updateUrlaub()"></div>
-      <div><label>Personalnummer</label><input type="text" id="u-id" placeholder="z.B. 1042" oninput="updateUrlaub()"></div>
-    </div>
-    <label>Vorgesetzter</label>
-    <input type="text" id="u-vorgesetzter" placeholder="Duc Thang Duong" value="Duc Thang Duong" oninput="updateUrlaub()">
-    <div class="row2">
-      <div><label>Urlaub von</label><input type="date" id="u-von" oninput="updateUrlaub()"></div>
-      <div><label>Urlaub bis</label><input type="date" id="u-bis" oninput="updateUrlaub()"></div>
-    </div>
-    <div class="row2">
-      <div><label>Wieder im Einsatz am</label><input type="date" id="u-einsatz" oninput="updateUrlaub()"></div>
-      <div><label>Rufnummer</label><input type="text" id="u-rufnummer" placeholder="+49 173 6084230" oninput="updateUrlaub()"></div>
+  <!-- Mode switcher -->
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button id="u-mode-btn-auto" class="btn btn-red" onclick="uSetMode('auto')" style="flex:1;justify-content:center">
+      📋 Formular ausfüllen
+    </button>
+    <button id="u-mode-btn-photo" class="btn" onclick="uSetMode('photo')" style="flex:1;justify-content:center">
+      📸 Foto signieren
+    </button>
+  </div>
+
+  <!-- MODE A: Auto fill PDF -->
+  <div id="u-mode-auto">
+    <div class="card">
+      <div class="card-title">📋 Formular ausfüllen <span class="badge badge-blu">PDF-Export</span></div>
+      <div class="info">Mitarbeiter wählen → Daten ausfüllen → Unterschrift zeichnen → PDF herunterladen.</div>
+
+      <label>Mitarbeiter</label>
+      <select id="u-emp" onchange="uFillEmp()">
+        <option value="">— Mitarbeiter wählen —</option>
+      </select>
+      <div class="row2">
+        <div><label>Name, Vorname</label><input type="text" id="u-name" placeholder="z.B. Nguyen Van A" oninput="updateUrlaub()"></div>
+        <div><label>Personalnummer</label><input type="text" id="u-id" placeholder="z.B. 1042" oninput="updateUrlaub()"></div>
+      </div>
+      <label>Vorgesetzter</label>
+      <input type="text" id="u-vorgesetzter" placeholder="Duc Thang Duong" value="Duc Thang Duong" oninput="updateUrlaub()">
+      <div class="row2">
+        <div><label>Urlaub von</label><input type="date" id="u-von" oninput="updateUrlaub()"></div>
+        <div><label>Urlaub bis</label><input type="date" id="u-bis" oninput="updateUrlaub()"></div>
+      </div>
+      <div class="row2">
+        <div><label>Wieder im Einsatz am</label><input type="date" id="u-einsatz" oninput="updateUrlaub()"></div>
+        <div><label>Rufnummer</label><input type="text" id="u-rufnummer" placeholder="+49 173 6084230" oninput="updateUrlaub()"></div>
+      </div>
+
+      <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift Arbeitgeber</div>
+        <p style="font-size:12px;color:var(--mut);margin-bottom:8px">Mit Finger zeichnen oder gespeicherte Unterschrift laden.</p>
+        <canvas id="u-sig-canvas" width="400" height="110"
+          style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+          onmousedown="uSigStart(event)" onmousemove="uSigDraw(event)" onmouseup="uSigEnd()" onmouseleave="uSigEnd()"
+          ontouchstart="uSigStart(event)" ontouchmove="uSigDraw(event)" ontouchend="uSigEnd()">
+        </canvas>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn-sm" onclick="uSigClear()">↺ Löschen</button>
+          <button class="btn btn-sm" onclick="uSigFromSaved()">📥 Gespeicherte laden</button>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-red" onclick="uGeneratePDF()" style="flex:1;justify-content:center;font-size:14px">⬇ PDF herunterladen</button>
+      </div>
+      <p id="u-pdf-status" style="font-size:12px;color:var(--mut);margin-top:8px;text-align:center"></p>
     </div>
 
-    <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
-      <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift Arbeitgeber</div>
-      <p style="font-size:12px;color:var(--mut);margin-bottom:8px">Mit Finger zeichnen oder gespeicherte Unterschrift laden. Ort &amp; Datum (Hannover, heute) werden automatisch eingetragen.</p>
-      <canvas id="u-sig-canvas" width="400" height="110"
-        style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
-        onmousedown="uSigStart(event)" onmousemove="uSigDraw(event)" onmouseup="uSigEnd()" onmouseleave="uSigEnd()"
-        ontouchstart="uSigStart(event)" ontouchmove="uSigDraw(event)" ontouchend="uSigEnd()">
-      </canvas>
-      <div class="btn-row" style="margin-top:8px">
-        <button class="btn btn-sm" onclick="uSigClear()">↺ Löschen</button>
-        <button class="btn btn-sm" onclick="uSigFromSaved()">📥 Gespeicherte laden</button>
+    <div class="result" id="u-res">
+      <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+      <div class="e-subj" id="u-subj"></div>
+      <div class="e-body" id="u-body"></div>
+      <div class="btn-row">
+        <button class="btn btn-red" onclick="copyMail('u')">📋 Kopieren</button>
+        <button class="btn btn-grn" onclick="uSharePDF()">📤 Teilen + Anhang</button>
+        <button class="btn" onclick="saveVerlauf('u')" style="margin-left:auto">✅ Gespeichert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE B: Sign photo from employee -->
+  <div id="u-mode-photo" style="display:none">
+    <div class="card">
+      <div class="card-title">📸 Mitarbeiter-Foto signieren <span class="badge badge-amb">Foto + Ký tên</span></div>
+      <div class="info">Foto/Scan vom Mitarbeiter hochladen → Unterschrift + Datum automatisch hinzufügen → PDF teilen.</div>
+
+      <label>Mitarbeiter (für Email)</label>
+      <select id="up-emp" onchange="upFillEmp()">
+        <option value="">— Mitarbeiter wählen —</option>
+      </select>
+      <div class="row2">
+        <div><label>Name (für Email)</label><input type="text" id="up-name" placeholder="z.B. Nguyen Van A" oninput="updateUrlaubPhoto()"></div>
+        <div><label>Personalnummer</label><input type="text" id="up-id" placeholder="z.B. 1042" oninput="updateUrlaubPhoto()"></div>
+      </div>
+
+      <label style="margin-top:14px">Foto / Scan hochladen</label>
+      <div class="drop" id="up-drop" onclick="document.getElementById('up-file').click()">
+        <div class="drop-icon">📸</div>
+        Urlaubsantrag-Foto hier ablegen oder klicken<br>
+        <small>JPG, PNG — vom Mitarbeiter per WhatsApp geschickt</small>
+        <input type="file" id="up-file" style="display:none" accept="image/*" onchange="upLoadPhoto(event)">
+      </div>
+
+      <!-- Photo canvas with signature placement -->
+      <div id="up-canvas-sec" style="display:none;margin-top:14px">
+        <div style="margin-top:14px;padding:14px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px">✍️ Unterschrift zeichnen</div>
+          <canvas id="up-sig-canvas" width="400" height="100"
+            style="border:1.5px solid var(--brd);border-radius:var(--rs);background:#fff;touch-action:none;display:block;width:100%;cursor:crosshair"
+            onmousedown="upSigStart(event)" onmousemove="upSigDraw(event)" onmouseup="upSigEnd()" onmouseleave="upSigEnd()"
+            ontouchstart="upSigStart(event)" ontouchmove="upSigDraw(event)" ontouchend="upSigEnd()">
+          </canvas>
+          <div class="btn-row" style="margin-top:8px">
+            <button class="btn btn-sm" onclick="upSigClear()">↺ Löschen</button>
+            <button class="btn btn-sm" onclick="upSigFromSaved()">📥 Gespeicherte laden</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--brd)">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">📍 Unterschrift auf Foto platzieren</div>
+          <p style="font-size:12px;color:var(--mut);margin-bottom:8px">
+            Tippen Sie auf die Stelle im Foto, wo die Unterschrift erscheinen soll.<br>
+            <strong>Ort &amp; Datum (Hannover, heute)</strong> wird automatisch daneben eingefügt.
+          </p>
+          <div style="position:relative;border-radius:var(--rs);overflow:hidden;border:1px solid var(--brd)">
+            <canvas id="up-doc-canvas"
+              style="display:block;width:100%;cursor:crosshair;touch-action:none"
+              onclick="upPlaceSig(event)"
+              ontouchend="upPlaceSigTouch(event)">
+            </canvas>
+          </div>
+          <div class="btn-row" style="margin-top:8px">
+            <button class="btn btn-sm" onclick="upResetDoc()">↺ Zurücksetzen</button>
+            <button class="btn btn-grn" onclick="upExportPDF()" style="flex:1;justify-content:center">⬇ PDF herunterladen &amp; Teilen</button>
+          </div>
+          <p id="up-status" style="font-size:12px;color:var(--mut);margin-top:6px;text-align:center"></p>
+        </div>
       </div>
     </div>
 
-    <div class="btn-row" style="margin-top:14px">
-      <button class="btn btn-red" onclick="uGeneratePDF()" style="flex:1;justify-content:center;font-size:14px">⬇ PDF herunterladen</button>
+    <div class="result" id="up-res" style="display:none">
+      <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
+      <div class="e-subj" id="up-subj"></div>
+      <div class="e-body" id="up-body"></div>
+      <div class="btn-row">
+        <button class="btn btn-red" onclick="upCopyMail()">📋 Kopieren</button>
+        <button class="btn btn-grn" onclick="upShare()">📤 Teilen + Anhang</button>
+        <button class="btn" onclick="upSaveVerlauf()" style="margin-left:auto">✅ Gespeichert</button>
+      </div>
     </div>
-    <p id="u-pdf-status" style="font-size:12px;color:var(--mut);margin-top:8px;text-align:center"></p>
   </div>
 
-  <!-- Email section -->
-  <div class="result" id="u-res">
-    <div class="e-meta"><strong>An:</strong> teamsushi@zahlenwerk.de &nbsp;·&nbsp; <strong>CC:</strong> hr@sushi-circle.de</div>
-    <div class="e-subj" id="u-subj"></div>
-    <div class="e-body" id="u-body"></div>
-    <div class="btn-row">
-      <button class="btn btn-red" onclick="copyMail('u')">📋 Kopieren</button>
-      <button class="btn btn-grn" onclick="uSharePDF()">📤 Teilen + Anhang</button>
-      <button class="btn" onclick="saveVerlauf('u')" style="margin-left:auto">✅ Gespeichert</button>
-    </div>
-  </div>
 </div>
 
 
@@ -1182,6 +1268,236 @@ function copyMail(p) {
 function mailto(p) {
   const {subj,body}=getEmail(p);
   window.location.href=`mailto:${TO}?cc=${encodeURIComponent(CC)}&subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+
+// ─── URLAUBSANTRAG PHOTO MODE ────────────────────────────────
+var upDocImg = null;      // original loaded photo
+var upDocPixels = null;   // backup of clean canvas
+var upLastCanvas = null;  // for sharing
+
+function uSetMode(mode) {
+  document.getElementById('u-mode-auto').style.display  = mode==='auto'  ? 'block' : 'none';
+  document.getElementById('u-mode-photo').style.display = mode==='photo' ? 'block' : 'none';
+  document.getElementById('u-mode-btn-auto').className  = mode==='auto'  ? 'btn btn-red' : 'btn';
+  document.getElementById('u-mode-btn-photo').className = mode==='photo' ? 'btn btn-red' : 'btn';
+  // adjust flex:1
+  document.getElementById('u-mode-btn-auto').style.flex  = '1';
+  document.getElementById('u-mode-btn-photo').style.flex = '1';
+}
+
+function upFillEmp() {
+  var idx = document.getElementById('up-emp').value;
+  if(idx==='') return;
+  var e = loadEmps().filter(function(x){return x.active!==false;})[parseInt(idx)];
+  if(!e) return;
+  document.getElementById('up-name').value = e.name || '';
+  document.getElementById('up-id').value   = e.id   || '';
+  updateUrlaubPhoto();
+}
+
+function updateUrlaubPhoto() {
+  var name = document.getElementById('up-name').value || '[Name]';
+  var pid  = document.getElementById('up-id').value || '';
+  var pidStr = pid ? ' (Personalnr. ' + pid + ')' : '';
+  var subj = 'Urlaubsantrag \u2013 ' + name + pidStr;
+  document.getElementById('up-subj').textContent = 'Betreff: ' + subj;
+  document.getElementById('up-body').textContent =
+    'Sehr geehrte Damen und Herren,\n\nanbei \xfcbersende ich den genehmigten Urlaubsantrag von Herrn/Frau ' + name + pidStr + '.\n\nDer Antrag wurde von mir als Gebietsleiter genehmigt und liegt mit meiner Unterschrift versehen dieser E-Mail bei.\n\nBitte nehmen Sie den Urlaub entsprechend in der Personalverwaltung auf.\n\nBei R\xfcckfragen stehe ich Ihnen gerne zur Verf\xfcgung.\n\n' + SIG;
+  document.getElementById('up-res').style.display = 'block';
+}
+
+function upLoadPhoto(ev) {
+  var file = ev.target.files[0]; if(!file) return;
+  var drop = document.getElementById('up-drop');
+  drop.classList.add('ok'); drop.innerHTML = '\u2705 ' + file.name;
+  document.getElementById('up-canvas-sec').style.display = 'block';
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    upDocImg = new Image();
+    upDocImg.onload = function() {
+      var cv = document.getElementById('up-doc-canvas');
+      // Scale to max width 740px display, but keep full resolution in canvas
+      var maxW = 740;
+      var scale = Math.min(maxW / upDocImg.width, 1200 / upDocImg.height);
+      cv.width  = upDocImg.width  * scale;
+      cv.height = upDocImg.height * scale;
+      var ctx = cv.getContext('2d');
+      ctx.drawImage(upDocImg, 0, 0, cv.width, cv.height);
+      upDocPixels = ctx.getImageData(0, 0, cv.width, cv.height);
+    };
+    upDocImg.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Photo sig drawing ──
+var upDrawing = false;
+function upGetXY(ev, canvas) {
+  var r=canvas.getBoundingClientRect(), sx=canvas.width/r.width, sy=canvas.height/r.height;
+  var src=ev.touches?ev.touches[0]:ev;
+  return {x:(src.clientX-r.left)*sx, y:(src.clientY-r.top)*sy};
+}
+function upSigStart(ev) {
+  ev.preventDefault(); upDrawing=true;
+  var c=document.getElementById('up-sig-canvas'), p=upGetXY(ev,c);
+  c.getContext('2d').beginPath(); c.getContext('2d').moveTo(p.x,p.y);
+}
+function upSigDraw(ev) {
+  if(!upDrawing) return; ev.preventDefault();
+  var c=document.getElementById('up-sig-canvas'), p=upGetXY(ev,c);
+  var ctx=c.getContext('2d');
+  ctx.strokeStyle='#1A1A18'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.lineTo(p.x,p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+}
+function upSigEnd() { upDrawing=false; }
+function upSigClear() { var c=document.getElementById('up-sig-canvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); }
+function upSigFromSaved() {
+  if(!sigImg){alert('Keine gespeicherte Unterschrift.');return;}
+  var c=document.getElementById('up-sig-canvas'), ctx=c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  var scale=Math.min(c.width/sigImg.width,c.height/sigImg.height)*0.85;
+  var w=sigImg.width*scale, h=sigImg.height*scale;
+  ctx.drawImage(sigImg,(c.width-w)/2,(c.height-h)/2,w,h);
+}
+function upSigHasContent() {
+  var c=document.getElementById('up-sig-canvas');
+  var d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+  for(var i=3;i<d.length;i+=4){if(d[i]>10)return true;} return false;
+}
+
+// ── Place sig on document photo ──
+function upGetDocXY(ev) {
+  var cv = document.getElementById('up-doc-canvas');
+  var r = cv.getBoundingClientRect();
+  var sx = cv.width/r.width, sy = cv.height/r.height;
+  return {x:(ev.clientX-r.left)*sx, y:(ev.clientY-r.top)*sy};
+}
+function upPlaceSig(ev) {
+  if(!upDocPixels){ alert('Bitte zuerst Foto hochladen.'); return; }
+  if(!upSigHasContent() && !sigImg){ alert('Bitte zuerst Unterschrift zeichnen.'); return; }
+  var cv = document.getElementById('up-doc-canvas');
+  var ctx = cv.getContext('2d');
+  // Restore clean photo
+  ctx.putImageData(upDocPixels, 0, 0);
+  var p = upGetDocXY(ev);
+  _upDrawSigAt(ctx, cv, p.x, p.y);
+}
+function upPlaceSigTouch(ev) {
+  ev.preventDefault();
+  if(!upDocPixels || (!upSigHasContent() && !sigImg)) return;
+  var cv = document.getElementById('up-doc-canvas');
+  var ctx = cv.getContext('2d');
+  ctx.putImageData(upDocPixels, 0, 0);
+  var r = cv.getBoundingClientRect();
+  var touch = ev.changedTouches[0];
+  var sx = cv.width/r.width, sy = cv.height/r.height;
+  var x = (touch.clientX-r.left)*sx, y = (touch.clientY-r.top)*sy;
+  _upDrawSigAt(ctx, cv, x, y);
+}
+function _upDrawSigAt(ctx, cv, x, y) {
+  var today = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var datumText = 'Hannover, ' + today;
+
+  // Font size relative to canvas width
+  var fs = Math.max(14, Math.round(cv.width * 0.028));
+  ctx.font = 'bold ' + fs + 'px Arial, sans-serif';
+  ctx.fillStyle = '#000000';
+  ctx.fillText(datumText, x, y - (upSigHasContent() ? Math.round(cv.width*0.06)+8 : 6));
+
+  // Draw signature
+  var sigSrc = upSigHasContent() ? document.getElementById('up-sig-canvas') : sigImg;
+  if(sigSrc) {
+    var sigW = Math.round(cv.width * 0.22);
+    var sigH = Math.round(sigSrc.height/sigSrc.width * sigW);
+    ctx.drawImage(sigSrc, x, y - sigH, sigW, sigH);
+  }
+  upLastCanvas = cv;
+}
+
+function upResetDoc() {
+  if(!upDocPixels) return;
+  var cv = document.getElementById('up-doc-canvas');
+  cv.getContext('2d').putImageData(upDocPixels, 0, 0);
+  upLastCanvas = null;
+}
+
+function upExportPDF() {
+  if(!upLastCanvas && !upDocPixels) { alert('Bitte zuerst Unterschrift platzieren.'); return; }
+  var status = document.getElementById('up-status');
+  status.textContent = 'PDF wird erstellt...';
+  var cv = upLastCanvas || document.getElementById('up-doc-canvas');
+  var jsPDF = (window.jspdf||jspdf).jsPDF;
+
+  // Determine orientation based on image aspect ratio
+  var isLandscape = cv.width > cv.height;
+  var doc = new jsPDF({
+    orientation: isLandscape ? 'landscape' : 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  });
+  var pgW = isLandscape ? 297 : 210;
+  var pgH = isLandscape ? 210 : 297;
+
+  // Fit image to page
+  var imgAspect = cv.width / cv.height;
+  var pgAspect  = pgW / pgH;
+  var w, h;
+  if(imgAspect > pgAspect) { w=pgW; h=pgW/imgAspect; } 
+  else { h=pgH; w=pgH*imgAspect; }
+  var xOff = (pgW-w)/2, yOff = (pgH-h)/2;
+
+  doc.addImage(cv.toDataURL('image/jpeg',0.92), 'JPEG', xOff, yOff, w, h);
+  var name = document.getElementById('up-name').value || 'Mitarbeiter';
+  var heute = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\./g,'-');
+  var fname = 'Urlaubsantrag_' + name.replace(/\s+/g,'_') + '_' + heute + '.pdf';
+  doc.save(fname);
+  status.textContent = 'PDF heruntergeladen!';
+  toast('PDF erstellt!');
+}
+
+async function upShare() {
+  var e = {
+    subj: document.getElementById('up-subj').textContent.replace('Betreff: ',''),
+    body: document.getElementById('up-body').textContent
+  };
+  var cv = upLastCanvas || document.getElementById('up-doc-canvas');
+  if(!cv) { navigator.clipboard && navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body); toast('Kopiert'); return; }
+  cv.toBlob(async function(blob) {
+    var name = document.getElementById('up-name').value || 'Mitarbeiter';
+    var heute = new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\./g,'-');
+    var file = new File([blob], 'Urlaubsantrag_'+name.replace(/\s+/g,'_')+'_'+heute+'.jpg', {type:'image/jpeg'});
+    var shareData = {title:e.subj, text:'Betreff: '+e.subj+'\n\n'+e.body};
+    if(navigator.canShare && navigator.canShare({files:[file]})) shareData.files=[file];
+    if(navigator.share){
+      try{ await navigator.share(shareData); }
+      catch(err){ if(err.name!=='AbortError'){ navigator.clipboard && navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body); toast('Kopiert'); } }
+    } else { navigator.clipboard && navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body); toast('E-Mail kopiert'); }
+  }, 'image/jpeg', 0.92);
+}
+
+function upCopyMail() {
+  var subj = document.getElementById('up-subj').textContent.replace('Betreff: ','');
+  var body = document.getElementById('up-body').textContent;
+  navigator.clipboard.writeText('Betreff: '+subj+'\n\n'+body)
+    .then(function(){toast('Kopiert!');})
+    .catch(function(){var ta=document.createElement('textarea');ta.value='Betreff: '+subj+'\n\n'+body;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Kopiert!');});
+}
+
+function upSaveVerlauf() {
+  var subj = document.getElementById('up-subj').textContent.replace('Betreff: ','');
+  var body = document.getElementById('up-body').textContent;
+  var name = document.getElementById('up-name').value || '';
+  var pid  = document.getElementById('up-id').value   || '';
+  var now  = new Date();
+  var entry = {
+    id: now.getTime(), typ:'Urlaubsantrag', subj:subj, body:body,
+    empName:name, empId:pid, filiale:'', zeitraum:'',
+    gesendetAm: now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})+' '+now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr',
+    status:'erledigt', notiz:''
+  };
+  var arr=loadVerlauf(); arr.unshift(entry); saveVerlaufData(arr);
+  toast('\u2705 Im Verlauf gespeichert!');
 }
 
 // ─── URLAUBSANTRAG PDF ───────────────────────────────────────
