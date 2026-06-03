@@ -684,28 +684,32 @@ function markDrop(p) {
 
 // ─── DROPDOWN POPULATION ─────────────────────────────────────
 function populateDropdowns() {
-  const emps = loadEmps().filter(e=>e.active!==false);
-  ['k','u','s'].forEach(p => {
-    const sel = document.getElementById(p+'-emp');
-    const cur = sel.value;
+  var emps = loadEmps().filter(function(e){return e.active!==false;});
+  // All employee dropdowns
+  ['k-emp','u-emp','up-emp','s-emp','av-emp'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if(!sel) return;
+    var cur = sel.value;
     sel.innerHTML = '<option value="">— Mitarbeiter wählen —</option>';
-    emps.forEach((e,i) => {
-      const opt = document.createElement('option');
+    emps.forEach(function(e,i) {
+      var opt = document.createElement('option');
       opt.value = i;
-      opt.textContent = `${e.name}  [${e.id}]`;
+      opt.textContent = e.name + '  [' + e.id + ']';
       sel.appendChild(opt);
     });
     sel.value = cur;
   });
   // DT dropdown
-  const dtSel = document.getElementById('dt-add-sel');
-  dtSel.innerHTML = '<option value="">— Auswählen —</option>';
-  emps.forEach((e,i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = `${e.name}  [${e.id}]`;
-    dtSel.appendChild(opt);
-  });
+  var dtSel = document.getElementById('dt-add-sel');
+  if(dtSel) {
+    dtSel.innerHTML = '<option value="">— Auswählen —</option>';
+    emps.forEach(function(e,i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = e.name + '  [' + e.id + ']';
+      dtSel.appendChild(opt);
+    });
+  }
 }
 
 function fillEmp(p) {
