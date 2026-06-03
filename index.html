@@ -1741,8 +1741,7 @@ function uGeneratePDF() {
 
     function fillF(f, text) {
       if(!text) return;
-      ctx.fillStyle='#ffffff';
-      ctx.fillRect(f.x0,f.y0,f.x1-f.x0,f.y1-f.y0);
+      // Transparent - no white background
       ctx.fillStyle='#000000';
       ctx.font=(f.fs||22)+'px Arial,sans-serif';
       var th=f.fs||22;
@@ -1972,10 +1971,9 @@ function avGeneratePDF() {
       ctx1.drawImage(img1, 0, 0);
 
       function fillField(ctx, f, text, fontSize) {
-        var fs = fontSize || f.fs || AV_FONT_SZ;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(f.x0, f.y0, f.x1-f.x0, f.y1-f.y0);
         if(!text) return;
+        var fs = fontSize || f.fs || AV_FONT_SZ;
+        // No white background - transparent overlay
         ctx.fillStyle = '#000000';
         ctx.font = fs + 'px Arial, sans-serif';
         var th = fs;
@@ -2033,8 +2031,7 @@ function avGeneratePDF() {
       if(chkSo) {
         // Sonstiges: multiline
         var sonst = (document.getElementById('av-sonst-text').value||'').split('\n');
-        ctx2.fillStyle='#ffffff';
-        ctx2.fillRect(F2.sonst.x0, F2.sonst.y0, F2.sonst.x1-F2.sonst.x0, F2.sonst.y1-F2.sonst.y0);
+        // Transparent - no white background
         ctx2.fillStyle='#000000';
         ctx2.font = AV_FONT_SM+'px Arial, sans-serif';
         sonst.forEach(function(line,i){
