@@ -246,6 +246,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
     <div class="e-body" id="k-body"></div>
     <div class="btn-row">
       <button class="btn btn-red" onclick="copyMail('k')">📋 Kopieren</button>
+      <button class="btn" onclick="mailto('k')">✉️ Mail-App</button>
       <button class="btn btn-grn" onclick="shareKrankWithFile('k')">📤 Teilen + Attest</button>
       <button class="btn" onclick="saveVerlauf('k')" style="margin-left:auto">✅ Gespeichert</button>
     </div>
@@ -316,6 +317,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
       <div class="e-body" id="u-body"></div>
       <div class="btn-row">
         <button class="btn btn-red" onclick="copyMail('u')">📋 Kopieren</button>
+        <button class="btn" onclick="mailto('u')">✉️ Mail-App</button>
         <button class="btn btn-grn" onclick="uSharePDF()">📤 Teilen + Anhang</button>
         <button class="btn" onclick="saveVerlauf('u')" style="margin-left:auto">✅ Gespeichert</button>
       </div>
@@ -388,6 +390,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
       <div class="e-body" id="up-body"></div>
       <div class="btn-row">
         <button class="btn btn-red" onclick="upCopyMail()">📋 Kopieren</button>
+        <button class="btn" onclick="upMailto()">✉️ Mail-App</button>
         <button class="btn btn-grn" onclick="upShare()">📤 Teilen + Anhang</button>
         <button class="btn" onclick="upSaveVerlauf()" style="margin-left:auto">✅ Gespeichert</button>
       </div>
@@ -426,6 +429,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
     <div class="e-body" id="s-body"></div>
     <div class="btn-row">
       <button class="btn btn-red" onclick="copyMail('s')">📋 Kopieren</button>
+      <button class="btn" onclick="mailto('s')">✉️ Mail-App</button>
       <button class="btn btn-grn" onclick="shareMail('s', null)">📤 Teilen</button>
       <button class="btn" onclick="saveVerlauf('s')" style="margin-left:auto">✅ Gespeichert</button>
     </div>
@@ -458,6 +462,7 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
     <div class="e-body" id="dt-body"></div>
     <div class="btn-row">
       <button class="btn btn-red" onclick="copyMail('dt')">📋 Kopieren</button>
+      <button class="btn" onclick="mailto('dt')">✉️ Mail-App</button>
       <button class="btn btn-grn" onclick="shareMail('dt', null)">📤 Teilen</button>
       <button class="btn" onclick="saveVerlauf('dt')" style="margin-left:auto">✅ Gespeichert</button>
     </div>
@@ -1171,9 +1176,15 @@ async function shareMail(p, fileBlob) {
 
   // Add file if provided
   if(fileBlob) {
-    var shareFile = (fileBlob instanceof File) ? fileBlob : new File([fileBlob], fileBlob.name || 'Anhang', {type: fileBlob.type || 'application/octet-stream'});
-    if(navigator.canShare && navigator.canShare({files:[shareFile]})) {
+    var shareFile = (fileBlob instanceof File) ? fileBlob
+      : new File([fileBlob], fileBlob.name || 'Anhang', {type: fileBlob.type || 'application/octet-stream'});
+    var canAttach = navigator.canShare && navigator.canShare({files:[shareFile]});
+    if(canAttach) {
       shareData.files = [shareFile];
+    }
+    // If can't attach, note in text
+    if(!canAttach && fileBlob) {
+      shareData.text += '\n\n[Anhang: ' + (fileBlob.name||'Datei') + ' – bitte manuell anhängen]';
     }
   }
 
@@ -1246,10 +1257,37 @@ async function shareMailWithCanvas(p) {
 }
 
 async function shareKrankWithFile(p) {
-  // For Krankmeldung: share with uploaded Attest file
+  var e = getEmail(p);
+  var subj = e.subj;
+  var body = e.body;
   var fileInput = document.getElementById('k-file');
-  var file = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
-  await shareMail(p, file);
+  var rawFile = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
+
+  var shareData = {
+    title: subj,
+    text: 'Betreff: ' + subj + '\n\n' + body
+  };
+
+  if(rawFile) {
+    // Keep original File object directly — do NOT rewrap
+    if(navigator.canShare && navigator.canShare({files:[rawFile]})) {
+      shareData.files = [rawFile];
+    }
+  }
+
+  if(navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch(err) {
+      if(err.name !== 'AbortError') {
+        copyMail(p);
+        toast('Kopiert – bitte Anhang manuell hinzufügen');
+      }
+    }
+  } else {
+    copyMail(p);
+    toast('E-Mail kopiert');
+  }
 }
 
 // ─── COPY / MAILTO ───────────────────────────────────────────
@@ -1479,6 +1517,14 @@ async function upShare() {
       catch(err){ if(err.name!=='AbortError'){ navigator.clipboard && navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body); toast('Kopiert'); } }
     } else { navigator.clipboard && navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body); toast('E-Mail kopiert'); }
   }, 'image/jpeg', 0.92);
+}
+
+function upMailto() {
+  var subj = document.getElementById('up-subj').textContent.replace('Betreff: ','');
+  var body = document.getElementById('up-body').textContent;
+  window.location.href = 'mailto:' + TO + '?cc=' + encodeURIComponent(CC)
+    + '&subject=' + encodeURIComponent(subj)
+    + '&body=' + encodeURIComponent(body);
 }
 
 function upCopyMail() {
@@ -2007,9 +2053,15 @@ async function shareMail(p, fileBlob) {
 
   // Add file if provided
   if(fileBlob) {
-    var shareFile = (fileBlob instanceof File) ? fileBlob : new File([fileBlob], fileBlob.name || 'Anhang', {type: fileBlob.type || 'application/octet-stream'});
-    if(navigator.canShare && navigator.canShare({files:[shareFile]})) {
+    var shareFile = (fileBlob instanceof File) ? fileBlob
+      : new File([fileBlob], fileBlob.name || 'Anhang', {type: fileBlob.type || 'application/octet-stream'});
+    var canAttach = navigator.canShare && navigator.canShare({files:[shareFile]});
+    if(canAttach) {
       shareData.files = [shareFile];
+    }
+    // If can't attach, note in text
+    if(!canAttach && fileBlob) {
+      shareData.text += '\n\n[Anhang: ' + (fileBlob.name||'Datei') + ' – bitte manuell anhängen]';
     }
   }
 
@@ -2082,10 +2134,37 @@ async function shareMailWithCanvas(p) {
 }
 
 async function shareKrankWithFile(p) {
-  // For Krankmeldung: share with uploaded Attest file
+  var e = getEmail(p);
+  var subj = e.subj;
+  var body = e.body;
   var fileInput = document.getElementById('k-file');
-  var file = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
-  await shareMail(p, file);
+  var rawFile = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
+
+  var shareData = {
+    title: subj,
+    text: 'Betreff: ' + subj + '\n\n' + body
+  };
+
+  if(rawFile) {
+    // Keep original File object directly — do NOT rewrap
+    if(navigator.canShare && navigator.canShare({files:[rawFile]})) {
+      shareData.files = [rawFile];
+    }
+  }
+
+  if(navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch(err) {
+      if(err.name !== 'AbortError') {
+        copyMail(p);
+        toast('Kopiert – bitte Anhang manuell hinzufügen');
+      }
+    }
+  } else {
+    copyMail(p);
+    toast('E-Mail kopiert');
+  }
 }
 
 // ─── COPY / MAILTO ───────────────────────────────────────────
