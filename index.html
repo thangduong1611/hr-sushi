@@ -201,27 +201,21 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
 .dp-kw-hdr-pause{font-size:11px;color:var(--mut);}
 .dp-kw-hdr-yr{font-size:12px;font-weight:600;color:var(--txt);}
 .dp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.dp-table{border-collapse:collapse;width:100%;min-width:560px;font-size:12px;}
-.dp-table th{background:#F8F5F2;text-align:center;padding:6px 4px;border:1px solid var(--brd);font-size:11px;font-weight:600;white-space:nowrap;min-width:80px;}
-.dp-table th:first-child{text-align:left;min-width:110px;padding-left:8px;}
+.dp-table{border-collapse:collapse;width:100%;min-width:540px;font-size:12px;}
+.dp-table th{background:#F8F5F2;text-align:center;padding:6px 4px;border:1px solid var(--brd);font-size:11px;font-weight:600;white-space:nowrap;min-width:78px;}
+.dp-table th:first-child{text-align:left;min-width:100px;padding-left:8px;}
 .dp-table td{border:1px solid var(--brd);padding:3px 4px;vertical-align:middle;}
-.dp-table td:first-child{font-size:12px;font-weight:600;padding:4px 8px;background:#FAFAF7;white-space:nowrap;}
+.dp-table td:first-child{font-size:12px;font-weight:600;padding:4px 8px;background:#FAFAF7;white-space:nowrap;max-width:100px;}
 .dp-shift{width:100%;border:none;background:transparent;font-size:11px;text-align:center;padding:3px 2px;font-family:inherit;outline:none;color:var(--txt);}
 .dp-shift:focus{background:#FFFBF0;border-radius:3px;}
 .dp-cell-frei{background:#F0EDE8;}
 .dp-cell-urlaub{background:#EAFAF1;}
 .dp-cell-krank{background:#FDEDEC;}
-.dp-emp-row td:first-child{position:relative;}
-.dp-del-emp{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mut);cursor:pointer;font-size:13px;padding:0 2px;line-height:1;}
-.dp-del-emp:hover{color:var(--red);}
 .dp-emp-tag{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--brd);border-radius:var(--rs);padding:4px 9px;font-size:12px;margin:3px 3px 3px 0;}
-.dp-emp-tag button{background:none;border:none;cursor:pointer;color:var(--mut);font-size:12px;padding:0;line-height:1;}
-/* Route planner embedded */
+.dp-emp-tag button{background:none;border:none;cursor:pointer;color:var(--mut);font-size:13px;padding:0 1px;line-height:1;}
 .rp-chip{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--brd);background:var(--surf);color:var(--mut);transition:all .12s;}
 .rp-chip.on{background:var(--red);color:#fff;border-color:var(--red);}
-.rp-day{border:1.5px solid var(--brd);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .12s;min-height:72px;}
-.rp-day:hover{border-color:#aaa;}
-.rp-day.sel{border-width:2px;}
+.rp-day{border:1.5px solid var(--brd);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border .12s;min-height:72px;}
 .rp-day.ho{background:var(--bg);cursor:default;}
 .rp-day-lbl{font-size:10px;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
 .rp-day-name{font-size:12px;font-weight:600;line-height:1.3;margin-bottom:3px;}
@@ -723,29 +717,22 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
 
 <!-- ===== DIENSTPLAN ===== -->
 <div id="panel-dienstplan" class="panel">
-
   <div class="dp-sub-row">
     <button id="dp-btn-plan" class="btn btn-red" onclick="dpSetMode('plan')" style="flex:1;justify-content:center">📅 Filial-Dienstplan</button>
     <button id="dp-btn-route" class="btn" onclick="dpSetMode('route')" style="flex:1;justify-content:center">🚗 Mein Fahrtplan</button>
   </div>
 
-  <!-- ── FILIAL-DIENSTPLAN ── -->
   <div id="dp-mode-plan">
     <div class="card">
       <div class="card-title">📅 Monatlicher Dienstplan <span class="badge badge-red">PDF-Export</span></div>
       <div class="info">Filiale und Monat wählen → Mitarbeiter eintragen → Schichten eingeben → PDF erstellen und per WhatsApp teilen.</div>
       <div class="row2">
-        <div>
-          <label>Filiale</label>
+        <div><label>Filiale</label>
           <select id="dp-filiale" onchange="dpFilialeChange()">
             <option value="">— Filiale wählen —</option>
             <option value="_custom">Manuell eingeben…</option>
-          </select>
-        </div>
-        <div>
-          <label>Monat</label>
-          <input type="month" id="dp-month" oninput="dpInit()">
-        </div>
+          </select></div>
+        <div><label>Monat</label><input type="month" id="dp-month" oninput="dpInit()"></div>
       </div>
       <div id="dp-custom-wrap" style="display:none;margin-top:8px">
         <label>Filialname (manuell)</label>
@@ -758,30 +745,23 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
         <div class="card-title" style="margin-bottom:10px">Mitarbeiter <span class="badge badge-blu" id="dp-emp-count">0</span></div>
         <div id="dp-emp-tags" style="margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-          <div style="flex:1;min-width:140px">
-            <label>Aus Mitarbeiterliste</label>
-            <select id="dp-add-sel"><option value="">— Auswählen —</option></select>
-          </div>
+          <div style="flex:1;min-width:140px"><label>Aus Mitarbeiterliste</label>
+            <select id="dp-add-sel"><option value="">— Auswählen —</option></select></div>
           <button class="btn btn-sm" onclick="dpAddFromList()" style="height:36px;margin-bottom:0">+ Hinzufügen</button>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
-          <div style="flex:1;min-width:140px">
-            <label>Manuell (Name)</label>
-            <input type="text" id="dp-add-name" placeholder="Name eingeben">
-          </div>
+          <div style="flex:1;min-width:140px"><label>Manuell (Name)</label>
+            <input type="text" id="dp-add-name" placeholder="Name eingeben"></div>
           <button class="btn btn-sm" onclick="dpAddManual()" style="height:36px;margin-bottom:0">+ Manuell</button>
         </div>
       </div>
-
       <datalist id="dp-presets">
         <option value="Frei"><option value="Urlaub"><option value="Krank">
         <option value="05:30-11:30"><option value="07:00-13:00"><option value="07:00-14:00">
         <option value="09:00-15:00"><option value="12:00-18:00"><option value="16:00-19:00">
         <option value="08:00-14:00"><option value="10:00-16:00"><option value="06:00-12:00">
       </datalist>
-
       <div id="dp-weeks-wrap"></div>
-
       <div class="btn-row">
         <button class="btn btn-red" onclick="dpExportPDF()" style="flex:1;justify-content:center">⬇ PDF herunterladen</button>
         <button class="btn btn-grn" onclick="dpSharePDF()">📤 WhatsApp</button>
@@ -791,12 +771,10 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
     </div>
   </div>
 
-  <!-- ── FAHRTPLAN ── -->
   <div id="dp-mode-route" style="display:none">
     <div class="card">
       <div class="card-title">🚗 Wöchentlicher Fahrtplan <span class="badge badge-grn">11 Filialen</span></div>
-      <div class="info">Jede Woche neu würfeln — die Besuchsreihenfolge ändert sich zufällig, damit Filialen den Besuchstag nicht vorhersagen können.</div>
-
+      <div class="info">Jede Woche neu würfeln — Besuchsreihenfolge ändert sich zufällig.</div>
       <div style="margin-bottom:12px">
         <div style="font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Home Office</div>
         <div id="rp-ho-chips" style="display:flex;gap:5px;flex-wrap:wrap"></div>
@@ -805,13 +783,10 @@ input[type=text],input[type=date],input[type=month],input[type=time],input[type=
         <button onclick="rpRegen()" class="btn btn-red" style="flex:1;justify-content:center">🔀 Neue Woche würfeln</button>
         <button onclick="rpCopyText()" class="btn" style="flex:1;justify-content:center">📋 Kopieren</button>
       </div>
-
       <div id="rp-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px"></div>
       <div id="rp-detail"></div>
-
     </div>
   </div>
-
 </div>
 
 </div><!-- /wrap -->
@@ -2316,570 +2291,296 @@ function exportVerlauf(){
 }
 
 
-// ─── SHARE / TEILEN ──────────────────────────────────────────
-async function shareMail(p, fileBlob) {
-  var e = getEmail(p);
-  var subj = e.subj;
-  var body = e.body;
-
-  // Build share data
-  var shareData = {
-    title: subj,
-    text: 'Betreff: ' + subj + '\n\n' + body
-  };
-
-  // Add file if provided
-  if(fileBlob) {
-    var shareFile = (fileBlob instanceof File) ? fileBlob
-      : new File([fileBlob], fileBlob.name || 'Anhang', {type: fileBlob.type || 'application/octet-stream'});
-    var canAttach = navigator.canShare && navigator.canShare({files:[shareFile]});
-    if(canAttach) {
-      shareData.files = [shareFile];
-    }
-    // If can't attach, note in text
-    if(!canAttach && fileBlob) {
-      shareData.text += '\n\n[Anhang: ' + (fileBlob.name||'Datei') + ' – bitte manuell anhängen]';
-    }
-  }
-
-  if(navigator.share) {
-    try {
-      await navigator.share(shareData);
-    } catch(err) {
-      if(err.name !== 'AbortError') {
-        // Fallback: copy to clipboard
-        copyMail(p);
-        toast('In Zwischenablage kopiert – bitte manuell einfügen');
-      }
-    }
-  } else {
-    // Desktop fallback
-    copyMail(p);
-    toast('E-Mail kopiert – Share nicht verfügbar');
-  }
-}
-
-async function shareMailWithCanvas(p) {
-  // For Urlaubsantrag: share email text + signed document image
-  var canvas = document.getElementById('u-canvas');
-  var drawCanvas = document.getElementById('u-draw-canvas');
-
-  // Check if document has been loaded and (optionally) signed
-  var hasDoc = canvas && canvas.width > 10;
-
-  if(!hasDoc) {
-    // No document loaded – share text only
-    await shareMail(p, null);
-    return;
-  }
-
-  try {
-    // Convert the signed document canvas to blob
-    canvas.toBlob(async function(blob) {
-      if(!blob) { await shareMail(p, null); return; }
-
-      var e = getEmail(p);
-      var empName = document.getElementById('u-name').value || 'Mitarbeiter';
-      var file = new File([blob], 'Urlaubsantrag_' + empName.replace(/\s+/g,'_') + '.png', {type:'image/png'});
-
-      var shareData = {
-        title: e.subj,
-        text: 'Betreff: ' + e.subj + '\n\n' + e.body
-      };
-
-      if(navigator.canShare && navigator.canShare({files:[file]})) {
-        shareData.files = [file];
-      }
-
-      if(navigator.share) {
-        try {
-          await navigator.share(shareData);
-        } catch(err) {
-          if(err.name !== 'AbortError') {
-            copyMail(p);
-            toast('In Zwischenablage kopiert');
-          }
-        }
-      } else {
-        copyMail(p);
-        toast('E-Mail kopiert – Share nicht verfügbar');
-      }
-    }, 'image/png');
-  } catch(err) {
-    await shareMail(p, null);
-  }
-}
-
-async function shareKrankWithFile(p) {
-  var e = getEmail(p);
-  var subj = e.subj;
-  var body = e.body;
-  var fileInput = document.getElementById('k-file');
-  var rawFile = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
-
-  var shareData = {
-    title: subj,
-    text: 'Betreff: ' + subj + '\n\n' + body
-  };
-
-  if(rawFile) {
-    // Keep original File object directly — do NOT rewrap
-    if(navigator.canShare && navigator.canShare({files:[rawFile]})) {
-      shareData.files = [rawFile];
-    }
-  }
-
-  if(navigator.share) {
-    try {
-      await navigator.share(shareData);
-    } catch(err) {
-      if(err.name !== 'AbortError') {
-        copyMail(p);
-        toast('Kopiert – bitte Anhang manuell hinzufügen');
-      }
-    }
-  } else {
-    copyMail(p);
-    toast('E-Mail kopiert');
-  }
-}
-
-// ─── COPY / MAILTO ───────────────────────────────────────────
-function getEmail(p){return{subj:document.getElementById(p+'-subj').textContent.replace('Betreff: ',''),body:document.getElementById(p+'-body').textContent};}
-function copyMail(p){
-  var e=getEmail(p);
-  navigator.clipboard.writeText('Betreff: '+e.subj+'\n\n'+e.body)
-    .then(function(){toast('E-Mail kopiert!');})
-    .catch(function(){var ta=document.createElement('textarea');ta.value='Betreff: '+e.subj+'\n\n'+e.body;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Kopiert!');});
-}
-function mailto(p){var e=getEmail(p);window.location.href='mailto:'+TO+'?cc='+encodeURIComponent(CC)+'&subject='+encodeURIComponent(e.subj)+'&body='+encodeURIComponent(e.body);}
-
 
 // ═══════════════════════════════════════════════════════════
-// ── DIENSTPLAN ─────────────────────────────────────────────
+// ── DIENSTPLAN ─────────────────────────────────────────════
 // ═══════════════════════════════════════════════════════════
-
-// ── Storage ──
-function dpKey(){return 'sc_dp_'+dpGetFiliale().replace(/\s+/g,'_').toLowerCase()+'_'+document.getElementById('dp-month').value;}
 function dpGetFiliale(){
   var sel=document.getElementById('dp-filiale').value;
-  if(sel==='_custom') return (document.getElementById('dp-custom-name').value||'').trim();
-  return sel||'';
+  return sel==='_custom'?(document.getElementById('dp-custom-name').value||'').trim():sel||'';
 }
-function dpLoad(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch(e){return null;}}
-function dpStore(key,data){localStorage.setItem(key,JSON.stringify(data));}
+function dpKey(){return 'sc_dp_'+dpGetFiliale().replace(/\s+/g,'_').toLowerCase()+'_'+document.getElementById('dp-month').value;}
+function dpLoadLS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+function dpStoreLS(k,d){localStorage.setItem(k,JSON.stringify(d));}
 
-// ── State ──
-var dpEmployees=[]; // [{name,id}]
-var dpShifts={};    // {empKey: {dateStr: shiftStr}}
+var dpEmployees=[], dpShifts={};
+function dpEmpKey(e){return (e.id||'x')+'-'+e.name;}
 
-function dpEmpKey(emp){return (emp.id||'__')+'-'+emp.name;}
-
-// ── Mode toggle ──
 function dpSetMode(m){
   document.getElementById('dp-mode-plan').style.display=m==='plan'?'block':'none';
   document.getElementById('dp-mode-route').style.display=m==='route'?'block':'none';
   document.getElementById('dp-btn-plan').className=m==='plan'?'btn btn-red':'btn';
   document.getElementById('dp-btn-route').className=m==='route'?'btn btn-red':'btn';
-  if(m==='route'){rpInit();}
+  if(m==='route')rpInit();
 }
+function dpOnShow(){dpPopulateFiliale();if(!rpSchedule.length)rpInit();}
 
-function dpOnShow(){
-  dpPopulateFiliale();
-  rpInit();
-}
-
-// ── Filiale dropdown ──
 function dpPopulateFiliale(){
   var emps=loadEmps().filter(function(e){return e.active!==false;});
   var filialen=[...new Set(emps.map(function(e){return e.filiale||'';}).filter(Boolean))].sort();
-  var sel=document.getElementById('dp-filiale');
-  var cur=sel.value;
+  var sel=document.getElementById('dp-filiale'),cur=sel.value;
   sel.innerHTML='<option value="">— Filiale wählen —</option>';
-  filialen.forEach(function(f){
-    var o=document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o);
-  });
+  filialen.forEach(function(f){var o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
   sel.innerHTML+='<option value="_custom">Manuell eingeben…</option>';
-  if(cur) sel.value=cur;
+  if(cur)sel.value=cur;
 }
-
 function dpFilialeChange(){
-  var sel=document.getElementById('dp-filiale').value;
-  document.getElementById('dp-custom-wrap').style.display=sel==='_custom'?'block':'none';
-  dpInit();
+  document.getElementById('dp-custom-wrap').style.display=document.getElementById('dp-filiale').value==='_custom'?'block':'none';
+  dpEmployees=[];dpShifts={};dpInit();
 }
-
-// ── Init schedule ──
 function dpInit(){
-  var filiale=dpGetFiliale();
-  var month=document.getElementById('dp-month').value;
-  if(!filiale||!month){document.getElementById('dp-editor').style.display='none';return;}
+  var f=dpGetFiliale(),m=document.getElementById('dp-month').value;
+  if(!f||!m){document.getElementById('dp-editor').style.display='none';return;}
   document.getElementById('dp-editor').style.display='block';
-
-  // Try to load saved data
-  var saved=dpLoad(dpKey());
-  if(saved){
-    dpEmployees=saved.employees||[];
-    dpShifts=saved.shifts||{};
-  } else {
-    // Auto-populate employees from filiale
-    if(dpEmployees.length===0){
-      var emps=loadEmps().filter(function(e){return e.active!==false&&(e.filiale||'')===(filiale);});
+  var saved=dpLoadLS(dpKey());
+  if(saved){dpEmployees=saved.employees||[];dpShifts=saved.shifts||{};}
+  else{
+    if(!dpEmployees.length){
+      var emps=loadEmps().filter(function(e){return e.active!==false&&(e.filiale||'')===(f);});
       dpEmployees=emps.map(function(e){return{name:e.name,id:e.id};});
     }
     dpShifts={};
   }
-  dpRenderEmpTags();
-  dpRenderWeeks();
-  dpPopulateAddSel();
+  dpRenderEmpTags();dpRenderWeeks();dpPopulateAddSel();
 }
-
-// ── Employee management ──
 function dpRenderEmpTags(){
   var c=document.getElementById('dp-emp-tags');
-  if(!dpEmployees.length){c.innerHTML='<span style="font-size:12px;color:var(--mut)">Noch keine Mitarbeiter hinzugefügt.</span>';document.getElementById('dp-emp-count').textContent='0';return;}
+  document.getElementById('dp-emp-count').textContent=dpEmployees.length;
+  if(!dpEmployees.length){c.innerHTML='<span style="font-size:12px;color:var(--mut)">Noch keine Mitarbeiter.</span>';return;}
   c.innerHTML=dpEmployees.map(function(e,i){
     return '<span class="dp-emp-tag">'+e.name+'<button onclick="dpRemoveEmp('+i+')">×</button></span>';
   }).join('');
-  document.getElementById('dp-emp-count').textContent=dpEmployees.length;
 }
-
 function dpPopulateAddSel(){
-  var filiale=dpGetFiliale();
-  var emps=loadEmps().filter(function(e){return e.active!==false;});
   var sel=document.getElementById('dp-add-sel');
+  var emps=loadEmps().filter(function(e){return e.active!==false;});
   sel.innerHTML='<option value="">— Auswählen —</option>';
   emps.forEach(function(e,i){
-    var alreadyIn=dpEmployees.some(function(x){return x.id===e.id;});
-    if(!alreadyIn){var o=document.createElement('option');o.value=i;o.textContent=e.name+' ['+e.id+']';sel.appendChild(o);}
+    if(!dpEmployees.some(function(x){return x.id===e.id;})){
+      var o=document.createElement('option');o.value=i;o.textContent=e.name+' ['+e.id+']';sel.appendChild(o);
+    }
   });
 }
-
-function dpAddFromList(){
-  var sel=document.getElementById('dp-add-sel');
-  var idx=sel.value; if(idx==='')return;
-  var e=loadEmps().filter(function(x){return x.active!==false;})[parseInt(idx)];
-  if(!e)return;
-  if(dpEmployees.some(function(x){return x.id===e.id;})){toast('Bereits in der Liste!');return;}
-  dpSaveShiftsFromDOM();
-  dpEmployees.push({name:e.name,id:e.id});
-  dpRenderEmpTags(); dpRenderWeeks(); dpPopulateAddSel(); sel.value='';
-  toast('✓ '+e.name+' hinzugefügt');
-}
-
-function dpAddManual(){
-  var name=document.getElementById('dp-add-name').value.trim(); if(!name)return;
-  if(dpEmployees.some(function(x){return x.name===name;})){toast('Bereits in der Liste!');return;}
-  dpSaveShiftsFromDOM();
-  dpEmployees.push({name:name,id:''});
-  dpRenderEmpTags(); dpRenderWeeks(); document.getElementById('dp-add-name').value='';
-  toast('✓ '+name+' hinzugefügt');
-}
-
-function dpRemoveEmp(i){
-  if(!confirm(dpEmployees[i].name+' aus dem Dienstplan entfernen?'))return;
-  dpSaveShiftsFromDOM();
-  dpEmployees.splice(i,1);
-  dpRenderEmpTags(); dpRenderWeeks(); dpPopulateAddSel();
-}
-
-// ── Week calculation ──
-function dpGetKW(date){
-  var d=new Date(date); d.setHours(0,0,0,0);
-  d.setDate(d.getDate()+4-(d.getDay()||7));
-  var y=new Date(d.getFullYear(),0,1);
-  return Math.ceil((((d-y)/86400000)+1)/7);
-}
-
-function dpGetWeeks(yearMonth){
-  var parts=yearMonth.split('-'); var year=parseInt(parts[0]),month=parseInt(parts[1]);
-  var firstDay=new Date(year,month-1,1);
-  var lastDay=new Date(year,month,0);
-  var weeks=[]; var d=new Date(firstDay);
-  var dow=d.getDay(); if(dow!==1) d.setDate(d.getDate()-(dow===0?6:dow-1));
-  while(d<=lastDay){
-    var dates=[];
-    for(var i=0;i<6;i++){dates.push(new Date(d).toISOString().split('T')[0]);d.setDate(d.getDate()+1);}
-    d.setDate(d.getDate()+1); // skip Sunday
-    weeks.push({kw:dpGetKW(new Date(dates[0])),dates:dates});
-  }
-  return weeks;
-}
-
-// ── Save shifts from DOM ──
-function dpSaveShiftsFromDOM(){
-  document.querySelectorAll('.dp-shift-inp').forEach(function(inp){
-    var ek=inp.dataset.emp, dt=inp.dataset.date;
-    if(!dpShifts[ek]) dpShifts[ek]={};
+function dpSaveFromDOM(){
+  document.querySelectorAll('.dp-inp').forEach(function(inp){
+    var ek=inp.dataset.emp,dt=inp.dataset.date;
+    if(!dpShifts[ek])dpShifts[ek]={};
     dpShifts[ek][dt]=inp.value;
   });
 }
-
-// ── Render week grid ──
-function dpRenderWeeks(){
-  var month=document.getElementById('dp-month').value;
-  if(!month){return;}
-  var weeks=dpGetWeeks(month);
-  var DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-  var wrap=document.getElementById('dp-weeks-wrap');
-  var html='';
-  weeks.forEach(function(wk){
-    html+='<div class="card dp-kw-card">';
-    html+='<div class="dp-kw-hdr"><span class="dp-kw-hdr-kw">KW: '+wk.kw+'</span><span class="dp-kw-hdr-pause">Pause (Pflicht) &gt;6h: 30min &nbsp;·&nbsp; &gt;9h: 45min</span><span class="dp-kw-hdr-yr">'+new Date(wk.dates[0]).getFullYear()+'</span></div>';
-    html+='<div class="dp-scroll"><table class="dp-table"><thead><tr><th>Mitarbeiter</th>';
-    wk.dates.forEach(function(dt,di){
-      var d=new Date(dt); var dayStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
-      html+='<th>'+DAYS[di].substring(0,2)+'<br><small style="font-weight:400;font-size:10px">'+dayStr+'</small></th>';
-    });
-    html+='</tr></thead><tbody>';
-    if(!dpEmployees.length){
-      html+='<tr><td colspan="7" style="font-size:12px;color:var(--mut);padding:12px 8px;text-align:center">Noch keine Mitarbeiter hinzugefügt.</td></tr>';
-    } else {
-      dpEmployees.forEach(function(emp){
-        var ek=dpEmpKey(emp);
-        html+='<tr class="dp-emp-row"><td style="position:relative">'+emp.name+'</td>';
-        wk.dates.forEach(function(dt){
-          var val=(dpShifts[ek]&&dpShifts[ek][dt])||'';
-          var cls=''; if(val==='Frei')cls='dp-cell-frei'; else if(val==='Urlaub')cls='dp-cell-urlaub'; else if(val==='Krank')cls='dp-cell-krank';
-          html+='<td class="'+cls+'"><input class="dp-shift dp-shift-inp" list="dp-presets" value="'+val+'" data-emp="'+ek+'" data-date="'+dt+'" onchange="dpCellChanged(this)" oninput="dpCellChanged(this)"></td>';
-        });
-        html+='</tr>';
-      });
-    }
-    html+='</tbody></table></div></div>';
-  });
-  wrap.innerHTML=html;
+function dpAddFromList(){
+  var sel=document.getElementById('dp-add-sel'),idx=sel.value;if(idx==='')return;
+  var e=loadEmps().filter(function(x){return x.active!==false;})[parseInt(idx)];if(!e)return;
+  if(dpEmployees.some(function(x){return x.id===e.id;})){toast('Bereits in der Liste!');return;}
+  dpSaveFromDOM();dpEmployees.push({name:e.name,id:e.id});
+  dpRenderEmpTags();dpRenderWeeks();dpPopulateAddSel();sel.value='';toast('✓ '+e.name);
 }
-
+function dpAddManual(){
+  var name=document.getElementById('dp-add-name').value.trim();if(!name)return;
+  dpSaveFromDOM();dpEmployees.push({name:name,id:''});
+  dpRenderEmpTags();dpRenderWeeks();document.getElementById('dp-add-name').value='';
+}
+function dpRemoveEmp(i){
+  if(!confirm(dpEmployees[i].name+' entfernen?'))return;
+  dpSaveFromDOM();dpEmployees.splice(i,1);dpRenderEmpTags();dpRenderWeeks();dpPopulateAddSel();
+}
+function dpGetKW(date){
+  var d=new Date(date);d.setHours(0,0,0,0);d.setDate(d.getDate()+4-(d.getDay()||7));
+  return Math.ceil((((d-new Date(d.getFullYear(),0,1))/86400000)+1)/7);
+}
+function dpGetWeeks(ym){
+  var p=ym.split('-'),year=+p[0],month=+p[1];
+  var first=new Date(year,month-1,1),last=new Date(year,month,0);
+  var weeks=[],d=new Date(first),dow=d.getDay();
+  if(dow!==1)d.setDate(d.getDate()-(dow===0?6:dow-1));
+  while(d<=last){
+    var dates=[];for(var i=0;i<6;i++){dates.push(new Date(d).toISOString().split('T')[0]);d.setDate(d.getDate()+1);}
+    d.setDate(d.getDate()+1);weeks.push({kw:dpGetKW(new Date(dates[0])),dates:dates});
+  }
+  return weeks;
+}
 function dpCellChanged(inp){
-  var ek=inp.dataset.emp, dt=inp.dataset.date, val=inp.value;
-  if(!dpShifts[ek]) dpShifts[ek]={};
-  dpShifts[ek][dt]=val;
-  var td=inp.parentElement;
-  td.className=''; if(val==='Frei')td.className='dp-cell-frei'; else if(val==='Urlaub')td.className='dp-cell-urlaub'; else if(val==='Krank')td.className='dp-cell-krank';
+  var ek=inp.dataset.emp,dt=inp.dataset.date,val=inp.value;
+  if(!dpShifts[ek])dpShifts[ek]={};dpShifts[ek][dt]=val;
+  var td=inp.parentElement;td.className='';
+  if(val==='Frei')td.className='dp-cell-frei';
+  else if(val==='Urlaub')td.className='dp-cell-urlaub';
+  else if(val==='Krank')td.className='dp-cell-krank';
 }
-
-// ── Save ──
+function dpRenderWeeks(){
+  var m=document.getElementById('dp-month').value;if(!m)return;
+  var weeks=dpGetWeeks(m);
+  var DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  var h='';
+  weeks.forEach(function(wk){
+    h+='<div class="card dp-kw-card"><div class="dp-kw-hdr">'
+      +'<span class="dp-kw-hdr-kw">KW: '+wk.kw+'</span>'
+      +'<span class="dp-kw-hdr-pause">Pause &gt;6h: 30min · &gt;9h: 45min</span>'
+      +'<span class="dp-kw-hdr-yr">'+new Date(wk.dates[0]).getFullYear()+'</span>'
+      +'</div><div class="dp-scroll"><table class="dp-table"><thead><tr><th>Mitarbeiter</th>';
+    wk.dates.forEach(function(dt,di){
+      var d=new Date(dt),ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+      h+='<th>'+DAYS[di].substring(0,2)+'<br><small style="font-weight:400;font-size:10px">'+ds+'</small></th>';
+    });
+    h+='</tr></thead><tbody>';
+    if(!dpEmployees.length){h+='<tr><td colspan="7" style="padding:12px 8px;text-align:center;font-size:12px;color:var(--mut)">Noch keine Mitarbeiter hinzugefügt.</td></tr>';}
+    else{dpEmployees.forEach(function(emp){
+      var ek=dpEmpKey(emp);
+      h+='<tr><td title="'+emp.name+'">'+emp.name.substring(0,15)+(emp.name.length>15?'…':'')+'</td>';
+      wk.dates.forEach(function(dt){
+        var val=(dpShifts[ek]&&dpShifts[ek][dt])||'';
+        var cls=val==='Frei'?'dp-cell-frei':val==='Urlaub'?'dp-cell-urlaub':val==='Krank'?'dp-cell-krank':'';
+        h+='<td class="'+cls+'"><input class="dp-shift dp-inp" list="dp-presets" value="'+val+'" data-emp="'+ek+'" data-date="'+dt+'" oninput="dpCellChanged(this)"></td>';
+      });
+      h+='</tr>';
+    });}
+    h+='</tbody></table></div></div>';
+  });
+  document.getElementById('dp-weeks-wrap').innerHTML=h;
+}
 function dpSave(){
-  dpSaveShiftsFromDOM();
-  dpStore(dpKey(),{employees:dpEmployees,shifts:dpShifts});
-  toast('✓ Dienstplan gespeichert!');
+  dpSaveFromDOM();dpStoreLS(dpKey(),{employees:dpEmployees,shifts:dpShifts});toast('✓ Dienstplan gespeichert!');
 }
-
-// ── PDF Export ──
+var dpLastDoc=null,dpLastFname='';
 function dpExportPDF(){
-  dpSaveShiftsFromDOM();
-  var filiale=dpGetFiliale(), month=document.getElementById('dp-month').value;
-  if(!filiale||!month){alert('Bitte Filiale und Monat wählen.');return;}
+  dpSaveFromDOM();
+  var f=dpGetFiliale(),m=document.getElementById('dp-month').value;
+  if(!f||!m){alert('Bitte Filiale und Monat wählen.');return;}
   if(!dpEmployees.length){alert('Bitte Mitarbeiter hinzufügen.');return;}
-
-  var status=document.getElementById('dp-status'); status.textContent='PDF wird erstellt…';
+  var st=document.getElementById('dp-status');st.textContent='PDF wird erstellt…';
+  if(typeof window.jspdf==='undefined'&&typeof jspdf==='undefined'){st.textContent='jsPDF lädt…';setTimeout(dpExportPDF,1200);return;}
   var jsPDF=(window.jspdf||jspdf).jsPDF;
   var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-
-  var ML=8, MT=8, PW=194;
-  var COL_EMP=36, COL_D=(PW-COL_EMP)/6;
-  var ROW_KW=7, ROW_HEAD=12, ROW_EMP=7.5;
-  var DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-  var pageH=280; var y=MT;
-
-  // Title
-  doc.setFontSize(13); doc.setFont('helvetica','bold');
-  doc.text('Arbeitsplan – '+filiale, ML+PW/2, y+5.5, {align:'center'});
-  y+=10;
-
-  var weeks=dpGetWeeks(month);
-  weeks.forEach(function(wk){
-    // Page break check
-    var blockH=ROW_KW+ROW_HEAD+dpEmployees.length*ROW_EMP+4;
-    if(y+blockH>pageH){doc.addPage(); y=MT;}
-
-    // KW header row
-    doc.setFillColor(238,232,224); doc.rect(ML,y,PW,ROW_KW,'F');
-    doc.setDrawColor(200,195,188); doc.rect(ML,y,PW,ROW_KW,'S');
-    doc.setFontSize(8); doc.setFont('helvetica','bold');
-    doc.text('KW: '+wk.kw, ML+3, y+4.8);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7);
-    doc.text('Pause (Pflicht)  >6h: 30min    >9h: 45min', ML+22, y+4.8);
-    doc.setFont('helvetica','bold'); doc.setFontSize(8);
-    doc.text(String(new Date(wk.dates[0]).getFullYear()), ML+PW-10, y+4.8, {align:'right'});
-    y+=ROW_KW;
-
-    // Day header row
-    doc.setFillColor(248,244,240); doc.rect(ML,y,COL_EMP,ROW_HEAD,'F');
-    doc.setDrawColor(200,195,188); doc.rect(ML,y,COL_EMP,ROW_HEAD,'S');
-    doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-    doc.text('Mitarbeiter', ML+COL_EMP/2, y+4.5, {align:'center'});
-
+  var ML=8,MT=8,PW=194,CE=36,CD=(PW-CE)/6;
+  var RKW=7,RH=12,RE=7.5,DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  var pH=280,y=MT;
+  doc.setFontSize(13);doc.setFont('helvetica','bold');
+  doc.text('Arbeitsplan – '+f,ML+PW/2,y+5.5,{align:'center'});y+=10;
+  dpGetWeeks(m).forEach(function(wk){
+    var bH=RKW+RH+dpEmployees.length*RE+4;
+    if(y+bH>pH){doc.addPage();y=MT;}
+    doc.setFillColor(238,232,224);doc.rect(ML,y,PW,RKW,'F');
+    doc.setDrawColor(200,195,188);doc.rect(ML,y,PW,RKW,'S');
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('KW: '+wk.kw,ML+3,y+4.8);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);
+    doc.text('Pause (Pflicht)  >6h: 30min    >9h: 45min',ML+22,y+4.8);
+    doc.setFont('helvetica','bold');doc.setFontSize(8);
+    doc.text(String(new Date(wk.dates[0]).getFullYear()),ML+PW-3,y+4.8,{align:'right'});
+    y+=RKW;
+    doc.setFillColor(248,244,240);doc.rect(ML,y,CE,RH,'F');doc.setDrawColor(200,195,188);doc.rect(ML,y,CE,RH,'S');
+    doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.text('Mitarbeiter',ML+CE/2,y+4.5,{align:'center'});
     wk.dates.forEach(function(dt,di){
-      var x=ML+COL_EMP+di*COL_D;
-      var d=new Date(dt);
-      var dayStr=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
-      doc.setFillColor(248,244,240); doc.rect(x,y,COL_D,ROW_HEAD,'F');
-      doc.setDrawColor(200,195,188); doc.rect(x,y,COL_D,ROW_HEAD,'S');
-      doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-      doc.text(DAYS[di].substring(0,2), x+COL_D/2, y+4.2, {align:'center'});
-      doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
-      doc.text(dayStr, x+COL_D/2, y+9.2, {align:'center'});
+      var x=ML+CE+di*CD,d=new Date(dt);
+      var ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+      doc.setFillColor(248,244,240);doc.rect(x,y,CD,RH,'F');doc.setDrawColor(200,195,188);doc.rect(x,y,CD,RH,'S');
+      doc.setFontSize(7.5);doc.setFont('helvetica','bold');doc.text(DAYS[di].substring(0,2),x+CD/2,y+4.2,{align:'center'});
+      doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.text(ds,x+CD/2,y+9.2,{align:'center'});
     });
-    y+=ROW_HEAD;
-
-    // Employee rows
+    y+=RH;
     dpEmployees.forEach(function(emp){
-      if(y+ROW_EMP>pageH){doc.addPage(); y=MT;}
+      if(y+RE>pH){doc.addPage();y=MT;}
       var ek=dpEmpKey(emp);
-      // Emp name cell
-      doc.setFillColor(250,248,245); doc.rect(ML,y,COL_EMP,ROW_EMP,'F');
-      doc.setDrawColor(200,195,188); doc.rect(ML,y,COL_EMP,ROW_EMP,'S');
-      doc.setFontSize(7.5); doc.setFont('helvetica','bold');
-      var ename=emp.name.length>18?emp.name.substring(0,17)+'…':emp.name;
-      doc.text(ename, ML+2, y+ROW_EMP/2+2.5);
-      // Shift cells
+      doc.setFillColor(250,248,245);doc.rect(ML,y,CE,RE,'F');doc.setDrawColor(200,195,188);doc.rect(ML,y,CE,RE,'S');
+      doc.setFontSize(7.5);doc.setFont('helvetica','bold');
+      var en=emp.name.length>18?emp.name.substring(0,17)+'…':emp.name;
+      doc.text(en,ML+2,y+RE/2+2.5);
       wk.dates.forEach(function(dt,di){
-        var x=ML+COL_EMP+di*COL_D;
-        var val=(dpShifts[ek]&&dpShifts[ek][dt])||'';
-        if(val==='Krank'){doc.setFillColor(253,222,219);doc.rect(x,y,COL_D,ROW_EMP,'F');}
-        else if(val==='Urlaub'){doc.setFillColor(212,239,223);doc.rect(x,y,COL_D,ROW_EMP,'F');}
-        else if(val==='Frei'){doc.setFillColor(245,243,240);doc.rect(x,y,COL_D,ROW_EMP,'F');}
-        else{doc.setFillColor(255,255,255);doc.rect(x,y,COL_D,ROW_EMP,'F');}
-        doc.setDrawColor(200,195,188); doc.rect(x,y,COL_D,ROW_EMP,'S');
-        if(val){
-          doc.setFontSize(7); doc.setFont('helvetica', val==='Frei'?'normal':'bold');
-          doc.text(val, x+COL_D/2, y+ROW_EMP/2+2.5, {align:'center'});
-        }
+        var x=ML+CE+di*CD,val=(dpShifts[ek]&&dpShifts[ek][dt])||'';
+        if(val==='Krank'){doc.setFillColor(253,222,219);}
+        else if(val==='Urlaub'){doc.setFillColor(212,239,223);}
+        else if(val==='Frei'){doc.setFillColor(245,243,240);}
+        else{doc.setFillColor(255,255,255);}
+        doc.rect(x,y,CD,RE,'F');doc.setDrawColor(200,195,188);doc.rect(x,y,CD,RE,'S');
+        if(val){doc.setFontSize(7);doc.setFont('helvetica',val==='Frei'?'normal':'bold');doc.text(val,x+CD/2,y+RE/2+2.5,{align:'center'});}
       });
-      y+=ROW_EMP;
+      y+=RE;
     });
-    y+=4; // gap between weeks
+    y+=4;
   });
-
-  var mStr=new Date(month+'-01').toLocaleDateString('de-DE',{month:'long',year:'numeric'});
-  var fname='Dienstplan_'+filiale.replace(/\s+/g,'_')+'_'+month+'.pdf';
-  doc.save(fname);
-  dpLastDoc=doc; dpLastFname=fname;
-  status.textContent='✅ PDF erstellt: '+fname;
-  toast('📄 PDF herunterladen!');
+  var fname='Dienstplan_'+f.replace(/\s+/g,'_')+'_'+m+'.pdf';
+  doc.save(fname);dpLastDoc=doc;dpLastFname=fname;
+  st.textContent='✅ PDF: '+fname;toast('📄 PDF erstellt!');
 }
-
-var dpLastDoc=null, dpLastFname='';
-
 async function dpSharePDF(){
-  dpSaveShiftsFromDOM();
-  var filiale=dpGetFiliale(), month=document.getElementById('dp-month').value;
-  if(!filiale||!month){alert('Bitte Filiale und Monat wählen.');return;}
-  if(!dpLastDoc){dpExportPDF(); return;}
-
-  var pdfBlob=new Blob([dpLastDoc.output('arraybuffer')],{type:'application/pdf'});
-  var file=new File([pdfBlob],dpLastFname,{type:'application/pdf'});
-  var mStr=new Date(month+'-01').toLocaleDateString('de-DE',{month:'long',year:'numeric'});
-  var shareData={title:'Dienstplan '+filiale+' – '+mStr, text:'Dienstplan '+filiale+' – '+mStr+'
-
-Bitte beachtet den Dienstplan für diesen Monat.'};
-  if(navigator.canShare&&navigator.canShare({files:[file]})) shareData.files=[file];
-  if(navigator.share){
-    try{await navigator.share(shareData);}
-    catch(err){if(err.name!=='AbortError'){toast('Konnte nicht geteilt werden');}}
-  } else { toast('Share nicht verfügbar – bitte PDF herunterladen'); }
+  dpSaveFromDOM();
+  if(!dpLastDoc){dpExportPDF();setTimeout(dpSharePDF,1500);return;}
+  var mStr=new Date(document.getElementById('dp-month').value+'-01').toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  var f=dpGetFiliale();
+  var blob=new Blob([dpLastDoc.output('arraybuffer')],{type:'application/pdf'});
+  var file=new File([blob],dpLastFname,{type:'application/pdf'});
+  var sd={title:'Dienstplan '+f+' – '+mStr,text:'Dienstplan '+f+' – '+mStr};
+  if(navigator.canShare&&navigator.canShare({files:[file]}))sd.files=[file];
+  if(navigator.share){try{await navigator.share(sd);}catch(err){if(err.name!=='AbortError')toast('Fehler beim Teilen');}}
+  else toast('Share nicht verfügbar – bitte PDF herunterladen');
 }
 
-
-// ═══════════════════════════════════════════════════════════
-// ── FAHRTPLAN (Route Planner) ───────────────────────────────
-// ═══════════════════════════════════════════════════════════
+// ── FAHRTPLAN ─────────────────────────────────────────────────
 var RP_CL=[
   {id:'einbeck',name:'Einbeck / Northeim',c:'#185FA5',bg:'#ddeeff',txt:'#0C447C',
    stores:[{n:'Marktkauf Einbeck',a:'Altendorfer Tor 24, 37574 Einbeck',o:'08:00'},{n:'Edeka Northeim',a:'Robert Schnabel Str. 1, 37154 Northeim',o:'07:00'}],
-   km:213,dep:'07:00',bk:'13:30',wt:'ok',warn:'A7 thoáng nếu xuất phát trước 07:30.'},
+   km:213,dep:'07:00',bk:'13:30',wt:'ok',warn:'A7 thoang neu Abfahrt vor 07:30.'},
   {id:'bovenden',name:'Göttingen Nord',c:'#2E7D32',bg:'#e3f2e1',txt:'#1B5E20',
-   stores:[{n:'Edeka Bovenden',a:'Industriestraße 8, 37120 Bovenden',o:'07:00'},{n:'Tegut An der Lutter',a:'An der Lutter 22, 37075 Göttingen',o:'07:00'}],
+   stores:[{n:'Edeka Bovenden',a:'Industriestr. 8, 37120 Bovenden',o:'07:00'},{n:'Tegut An der Lutter',a:'An der Lutter 22, 37075 Göttingen',o:'07:00'}],
    km:241,dep:'06:30',bk:'13:00',wt:'ok',warn:'Abfahrt 06:30 — vor Göttingen-Stau ankommen.'},
   {id:'goettingen',name:'Göttingen Stadt',c:'#E65100',bg:'#fff0e0',txt:'#BF360C',
    stores:[{n:'Kaufland Göttingen-Grone',a:'Am Kauf Park 2, 37079 Göttingen',o:'08:00'},{n:'Tegut Göttingen Weender',a:'Weender Str. 75, 37073 Göttingen',o:'08:00'}],
-   km:238,dep:'07:30',bk:'14:00',wt:'ok',warn:'Mittwochs am ruhigsten — Abfahrt 07:30 reicht.'},
+   km:238,dep:'07:30',bk:'14:00',wt:'ok',warn:'Mittwoch am ruhigsten. Abfahrt 07:30 reicht.'},
   {id:'kassel',name:'Kassel / Baunatal',c:'#B71C1C',bg:'#fdecea',txt:'#7F0000',
-   stores:[{n:'Edeka Aschoff Kassel',a:'Frankfurter Str. 114-120, 34121 Kassel',o:'07:00'},{n:'Ratio Markt Baunatal',a:'Fuldastraße 1-5, 34225 Baunatal',o:'08:00'}],
-   km:353,dep:'06:00',bk:'14:30',wt:'warn',warn:'⚠ Kassel-Nord 07:30–09:00 Stau! Unbedingt 06:00 Uhr losfahren!'},
+   stores:[{n:'Edeka Aschoff Kassel',a:'Frankfurter Str. 114-120, 34121 Kassel',o:'07:00'},{n:'Ratio Markt Baunatal',a:'Fuldastr. 1-5, 34225 Baunatal',o:'08:00'}],
+   km:353,dep:'06:00',bk:'14:30',wt:'warn',warn:'⚠ Kassel-Nord 07:30-09:00 Stau! Unbedingt 06:00 Uhr losfahren!'},
   {id:'heiligenstadt',name:'Heiligenstadt / Nordhausen',c:'#4527A0',bg:'#ede7f6',txt:'#311B92',
    stores:[{n:'Rewe Heilbad Heiligenstadt',a:'Sperberwiese 1, 37308 Heiligenstadt',o:'06:00'},{n:'Marktkauf Nordhausen',a:'Nordhausen, Thüringen',o:'08:00'}],
-   km:397,dep:'06:30',bk:'15:00',wt:'warn',warn:'⚠ Freitags: Rückfahrt vor 11:00 Uhr! A7 ab 14:00 Uhr sehr voll.'},
+   km:397,dep:'06:30',bk:'15:00',wt:'warn',warn:'⚠ Freitags: Rückfahrt vor 11:00! A7 ab 14:00 sehr voll.'},
   {id:'homberg',name:'Homberg Efze',c:'#00695C',bg:'#e0f2f1',txt:'#004D40',
    stores:[{n:'Rewe Efze Homberg',a:'Kasseler Str. 3, 34576 Homberg (Efze)',o:'07:00'}],
-   km:370,dep:'08:00',bk:'13:30',wt:'ok',warn:'✅ Samstag ideal — kein Rush Hour auf A44/A7.'}
+   km:370,dep:'08:00',bk:'13:30',wt:'ok',warn:'Samstag ideal — kein Rush Hour auf A44/A7.'}
 ];
 var RP_DAYS=['Mo','Di','Mi','Do','Fr','Sa'];
 var RP_DAYF=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-var rpHoDay=-1, rpSchedule=[], rpHoDayIdx=-1, rpSelDay=-1;
-
+var rpHoDay=-1,rpSchedule=[],rpHoDayIdx=-1,rpSelDay=-1;
 function rpShuffle(a){var b=[...a];for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-
 function rpGen(){
   var ord=rpShuffle([0,1,2,3,4,5]);
   rpHoDayIdx=rpHoDay===-1?Math.floor(Math.random()*6):rpHoDay;
-  rpSchedule=new Array(6).fill(null);
-  rpSchedule[rpHoDayIdx]=-1;
-  var ci=0;
-  for(var d=0;d<6;d++) if(rpSchedule[d]===null) rpSchedule[d]=ord[ci++];
+  rpSchedule=new Array(6).fill(null);rpSchedule[rpHoDayIdx]=-1;
+  var ci=0;for(var d=0;d<6;d++)if(rpSchedule[d]===null)rpSchedule[d]=ord[ci++];
   rpSelDay=-1;
 }
-
-function rpInit(){
-  if(!rpSchedule.length) rpGen();
-  rpRender();
-}
-
+function rpInit(){if(!rpSchedule.length)rpGen();rpRender();}
 function rpRegen(){rpGen();rpRender();}
-
 function rpSetHO(d){rpHoDay=d;rpGen();rpRender();}
-
 function rpMapA(s){return 'https://maps.apple.com/?daddr='+encodeURIComponent(s.a)+'&dirflg=d';}
 function rpMapG(s){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(s.a);}
-
+function rpSelD(i){rpSelDay=(rpSelDay===i?-1:i);rpRender();}
 function rpRender(){
-  // HO chips
-  var chipsHtml=['Zufällig',...RP_DAYS].map(function(d,i){
+  var chips=['Zufällig',...RP_DAYS].map(function(d,i){
     return '<button class="rp-chip'+(rpHoDay===(i-1)?' on':'')+'" onclick="rpSetHO('+(i-1)+')">'+d+'</button>';
   }).join('');
-  document.getElementById('rp-ho-chips').innerHTML=chipsHtml;
-
-  // Grid
-  var gridHtml=RP_DAYS.map(function(day,i){
-    var isHO=i===rpHoDayIdx;
-    var cl=isHO?null:RP_CL[rpSchedule[i]];
-    var isSel=rpSelDay===i;
-    var bc=isSel?cl.c:'var(--brd)'; var bw=isSel?'2px':'1.5px';
-    var bg=isHO?'var(--bg)':(cl.bg+'33');
-    return '<div class="rp-day'+(isHO?' ho':'')+(isSel?' sel':'')+'" '
-      +'style="background:'+bg+';border-color:'+bc+';border-width:'+bw+'" '
-      +'onclick="'+(isHO?'':'rpSelD('+i+')')+'">'
+  document.getElementById('rp-ho-chips').innerHTML=chips;
+  var g=RP_DAYS.map(function(day,i){
+    var isHO=i===rpHoDayIdx,cl=isHO?null:RP_CL[rpSchedule[i]],isSel=rpSelDay===i;
+    var bc=isSel?cl.c:'var(--brd)',bw=isSel?'2px':'1.5px',bg=isHO?'var(--bg)':(cl.bg+'33');
+    return '<div class="rp-day'+(isHO?' ho':'')+'" style="background:'+bg+';border-color:'+bc+';border-width:'+bw+'" onclick="'+(isHO?'':'rpSelD('+i+')')+'\">'
       +'<div class="rp-day-lbl">'+day+'</div>'
-      +(isHO
-        ?'<div style="font-size:12px;color:var(--mut)">🏠 Home Office</div>'
-        :'<div class="rp-day-name" style="color:'+cl.txt+'">'+cl.name+'</div>'
-         +'<div class="rp-day-meta" style="color:'+cl.txt+'">⏰ '+cl.dep+' · '+cl.km+' km</div>'
-      )
-      +'</div>';
+      +(isHO?'<div style="font-size:12px;color:var(--mut)">🏠 Home Office</div>'
+      :'<div class="rp-day-name" style="color:'+cl.txt+'">'+cl.name+'</div>'
+      +'<div class="rp-day-meta" style="color:'+cl.txt+'">⏰ '+cl.dep+' · '+cl.km+' km</div>')+'</div>';
   }).join('');
-  document.getElementById('rp-grid').innerHTML=gridHtml;
-
-  // Detail
+  document.getElementById('rp-grid').innerHTML=g;
   rpRenderDetail();
 }
-
-function rpSelD(i){rpSelDay=(rpSelDay===i?-1:i);rpRender();}
-
 function rpRenderDetail(){
   var a=document.getElementById('rp-detail');
   if(rpSelDay===-1||rpSchedule[rpSelDay]===-1){a.innerHTML='';return;}
   var cl=RP_CL[rpSchedule[rpSelDay]];
-  var wbg=cl.wt==='warn'?'#fff8e1':'#f0faf0', wc=cl.wt==='warn'?'#e65100':'#2e7d32';
-  var html='<div style="border:1.5px solid '+cl.c+'40;border-radius:10px;overflow:hidden;margin-bottom:8px">'
+  var wbg=cl.wt==='warn'?'#fff8e1':'#f0faf0',wc=cl.wt==='warn'?'#e65100':'#2e7d32';
+  var h='<div style="border:1.5px solid '+cl.c+'40;border-radius:10px;overflow:hidden;margin-bottom:8px">'
     +'<div style="background:'+cl.bg+'80;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">'
     +'<div><div style="font-size:14px;font-weight:600;color:'+cl.txt+'">'+RP_DAYF[rpSelDay]+' — '+cl.name+'</div>'
     +'<div style="font-size:12px;color:var(--mut);margin-top:2px">Abfahrt '+cl.dep+' · Rückkehr '+cl.bk+' · '+cl.km+' km</div></div>'
-    +'<button onclick="rpSelD(-1)" style="background:none;border:none;color:var(--mut);cursor:pointer;font-size:18px">×</button>'
-    +'</div>';
+    +'<button onclick="rpSelD(-1)" style="background:none;border:none;color:var(--mut);cursor:pointer;font-size:18px">×</button></div>';
   cl.stores.forEach(function(s){
-    html+='<div class="rp-store-row" style="padding:9px 14px">'
+    h+='<div class="rp-store-row" style="padding:9px 14px">'
       +'<div><div style="font-size:13px;font-weight:600;margin-bottom:2px">'+s.n+'</div>'
       +'<div style="font-size:12px;color:var(--mut)">'+s.a+'</div>'
       +'<div style="font-size:11px;color:var(--mut)">Öffnung: '+s.o+'</div></div>'
@@ -2888,20 +2589,17 @@ function rpRenderDetail(){
       +'<a href="'+rpMapG(s)+'" class="rp-map-btn" style="background:var(--bg);color:var(--txt);border-color:var(--brd)">🗺 Google</a>'
       +'</div></div>';
   });
-  html+='<div style="margin:0 14px 12px;padding:8px 10px;border-radius:8px;background:'+wbg+';color:'+wc+';font-size:12px;line-height:1.5">'+cl.warn+'</div>';
-  html+='</div>';
-  a.innerHTML=html;
+  h+='<div style="margin:0 14px 12px;padding:8px 10px;border-radius:8px;background:'+wbg+';color:'+wc+';font-size:12px;line-height:1.5">'+cl.warn+'</div></div>';
+  a.innerHTML=h;
 }
-
 function rpCopyText(){
   var txt=RP_DAYF.map(function(day,i){
-    if(i===rpHoDayIdx) return day+': 🏠 Home Office';
+    if(i===rpHoDayIdx)return day+': Home Office';
     var cl=RP_CL[rpSchedule[i]];
     return day+' (Abfahrt '+cl.dep+'): '+cl.stores.map(function(s){return s.n;}).join(' + ');
   }).join('\n');
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(txt).then(function(){toast('✓ Fahrtplan kopiert!');});
-  } else { prompt('Kopieren:',txt); }
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('✓ Fahrtplan kopiert!');});}
+  else prompt('Kopieren:',txt);
 }
 
 // ─── INIT ────────────────────────────────────────────────────
